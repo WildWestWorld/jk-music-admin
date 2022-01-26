@@ -3,6 +3,9 @@ FROM node:lts-alpine as build-stage
 WORKDIR /app
 # package*.json 把package文件移除，以防依赖的版本无法更改
 COPY package*.json ./
+#初始化项目必备
+RUN npm i --legacy-peer-deps
+RUN npm i eslint-plugin-vue
 #运行命令npm install
 RUN npm install
 COPY . .

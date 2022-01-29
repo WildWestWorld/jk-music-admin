@@ -9,6 +9,11 @@
           <q-toolbar-title>
             捷凯音乐
           </q-toolbar-title>
+
+          <q-space />
+          <q-avatar color="primary" text-color="white">{{ nicknameFirstWord }}</q-avatar>
+
+
         </q-toolbar>
       </q-header>
 
@@ -30,6 +35,8 @@
 
 <script>
 import { ref } from 'vue'
+import {useStore} from "vuex";
+import {computed} from "vue";
 
 export default {
   name: "Layout",
@@ -37,8 +44,12 @@ export default {
   setup () {
     //其实就是定义了一个变量leftDrawerOpen为false
     const leftDrawerOpen = ref(false)
-
+    //使用vuex
+    const store =useStore();
     return {
+      nicknameFirstWord:computed(()=>{
+
+        return store.getters.nicknameFirstWord}),
       //引入该变量
       leftDrawerOpen,
       //方法，就是把leftDrawerOpen值变为相反的值，这个值就是设定菜单是否展开

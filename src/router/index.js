@@ -3,7 +3,21 @@ import Layout from "../views/layout/Layout.vue";
 import Index from "../views/layoutChildren/Index.vue";
 import Login from "../views/login/Login.vue";
 
-
+//暴露layoutChildren 方便页面拿到里面的值
+export const layoutChildren=[{
+  path: '/index',
+  name:"Index",
+  //meta 可以使用到页面上 使用userRouter 里面的getRoutes()方法 获取到meta 具体看Layout页面
+  meta:{title:'控制台', icon:'dashboard'},
+  component: ()=>import("../views/layoutChildren/Index.vue"),
+},{
+  path: '/user',
+  name:"User",
+  meta:{title:'用户管理', icon:'manage_accounts'},
+  component: ()=>import("../views/layoutChildren/User.vue"),
+},
+  //children止
+]
 
 const routes = [
   {
@@ -11,13 +25,8 @@ const routes = [
     name:"Layout",
     component: Layout,
     redirect:"/index",
-    children:[{
-      path: '/index',
-      name:"Index",
-      component: ()=>import("../views/layoutChildren/Index.vue"),
-    },
-        //children止
-    ]
+    //layoutChildren 使我们自定义的数组
+    children:layoutChildren,
     //Layout系列止
   },{
     path: '/login',

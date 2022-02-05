@@ -4,4 +4,7 @@ import request from "./request.js";
 export const login= (username,password)=>{
     return request.post('/login',{username,password})
 }
+export const getPageByUsername=( pageNum,pageSize,searchWord)=>{
+    return request.get("/users/pages",{params:{ pageNum,pageSize,searchWord}})
+}
 export default login;

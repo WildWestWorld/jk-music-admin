@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import { Quasar} from 'quasar';
+import { Quasar,Notify} from 'quasar';
 import router from './router';
 import store from './store/index.js'
 import './permission'
@@ -16,7 +16,7 @@ const myApp = createApp(App)
 myApp.use(router);
 myApp.use(store);
 myApp.use(Quasar, {
-  plugins: {}, // import Quasar plugins and add here
+  plugins: {Notify}, // import Quasar plugins and add here
 
 })
 

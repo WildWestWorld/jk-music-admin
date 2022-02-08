@@ -25,13 +25,16 @@ export const removeToken = () => {
     Cookies.remove(TokenKey);
 };
 
+
+//获得当前用户
 export const setCurrentUser = currentUser => {
     return Cookies.set(UserKey, JSON.stringify(currentUser));
 };
 
 export const getCurrentUser = () => {
     const user = Cookies.get(UserKey);
-    return user === undefined ? defaultUser : JSON.parse(user);
+
+    return user === undefined ? null : JSON.parse(user);
 };
 
 export const removeCurrentUser = () => {

@@ -62,6 +62,11 @@ export default {
     const onSubmit=(username,password)=>{
       //dispatch：含有异步操作，数据提交至 actions ，可用于向后台提交数据
       store.dispatch('login',{username,password}).then(res=>{
+        //如果登录成功了就执行，获取当前用户
+        //有兴趣可以去看store/modules/user
+        store.dispatch('fetchCurrentUser').then(res=>{
+          console.log(res);
+        })
         //router.push路由跳转，如果
         //$route.query (如果 URL 中有查询参数) 我们查询的就是redirect的值
         router.push({path:   (route.query.redirect||'/') });

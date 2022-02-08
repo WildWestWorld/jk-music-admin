@@ -11,9 +11,12 @@ const request = axios.create({
 // 比如统一加token，对请求参数统一加密
 request.interceptors.request.use(config => {
     config.headers['Content-Type'] = 'application/json;charset=utf-8';
+    //设置请求头前缀，我们获得的请求头，还没有前缀，所以要加上去
+    const tokenPrefix ='Bearer '
     // 设置请求头
+
     if (store.state.user.token){
-        config.headers['Authorization'] =store.state.user.token;
+        config.headers['Authorization'] =tokenPrefix+store.state.user.token;
     }
     // config.headers['token'] = user.token;  // 设置请求头
     return config
@@ -40,6 +43,8 @@ request.interceptors.response.use(
         return res;
     },
     error => {
+        //如果遇到错误，就执行掉vuex里面的
+        store.dispatch("logout")
         //使用的是quasar的notify插件，需要引入
         //功能是弹出消息框
         Notify.create({

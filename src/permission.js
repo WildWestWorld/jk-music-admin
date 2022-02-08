@@ -1,6 +1,6 @@
 import router from './router';
 import store from './store';
-import {getToken} from "./views/utils/auth.js";
+import {getToken} from "./utils/auth.js";
 
 //该文件为路由守卫配置
 

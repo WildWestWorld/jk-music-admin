@@ -54,6 +54,8 @@ const actions ={
                 commit('SET_CURRENT_USER',resUser);
                 setCurrentUser(resUser);
                 resolve(resUser);
+
+
             })
                 .catch(error=>{
                     reject(error);

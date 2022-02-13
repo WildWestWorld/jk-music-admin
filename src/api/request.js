@@ -43,19 +43,25 @@ request.interceptors.response.use(
         return res;
     },
     error => {
-        //如果遇到错误，就执行掉vuex里面的
-        store.dispatch("logout")
-        //使用的是quasar的notify插件，需要引入
-        //功能是弹出消息框
-        Notify.create({
-            type:'negative',
-            message:error.message,
-            position:'top'
-        })
+
+        //自定义的函数,就在下面，根据状态码 处理不同的错误
+         handleErrorResponse(error.response)
+
         console.log('err' + error) // for debug
         return Promise.reject(error)
     }
-)
-
+);
+const handleErrorResponse = (response)=>{
+    if(response.status ===401||403){
+        store.dispatch('logout').then(()=>{
+            
+        });
+    }
+    Notify.create({
+        type:'negative',
+        message:response.data.message,
+        position:'top'
+    })
+};
 
 export default request

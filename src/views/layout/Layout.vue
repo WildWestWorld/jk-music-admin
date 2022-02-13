@@ -11,7 +11,16 @@
           </q-toolbar-title>
 
           <q-space />
-          <q-avatar color="primary" text-color="white">{{ nicknameFirstWord }}</q-avatar>
+          <q-avatar color="teal" text-color="white">{{ nicknameFirstWord }}
+
+            <q-menu>
+              <q-list style="min-width: 100px">
+                <q-item clickable v-close-popup @click="handleLogout">
+                  <q-item-section >退出</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-avatar>
 
 
         </q-toolbar>
@@ -89,7 +98,7 @@ export default {
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       },
-
+      handleLogout:()=>store.dispatch('logout').then(()=>window.location.reload()),
       menuController,
       //这个值来自于router文件
       layoutChildren,

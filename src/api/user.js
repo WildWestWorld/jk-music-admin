@@ -4,10 +4,14 @@ import request from "./request.js";
 export const login= (username,password)=>{
     return request.post('/tokens',{username,password})
 }
+export const createUserRequest= (username,password)=>{
+    return request.post('/users',{username,password})
+}
 export const getPageByUsername=( pageNum,pageSize,searchWord)=>{
     return request.get("/users/pages",{params:{ pageNum,pageSize,searchWord}})
 }
 export const getCurrentUserByToken=()=>{
     return request.get('/users/currentUser')
 }
+
 export default login;

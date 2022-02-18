@@ -2,7 +2,7 @@
 
 //存储初值
 import {getCurrentUser, getToken, removeCurrentUser, removeToken, setCurrentUser, setToken} from "../../utils/auth.js";
-import login, {getCurrentUserByToken} from "../../api/user.js";
+import login, {createUserRequest, getCurrentUserByToken} from "../../api/user.js";
 
 const state = () => ({
     //getToken来自auth，用的是依赖jk-cookie方法来获取token，然后吧token放在vuex里面
@@ -30,6 +30,7 @@ const actions ={
                   // const token =response.headers['authorization']
 
                     //只是记录一下token，会在控制台打印出来给你看
+                    //commit调用的是mutations里面的方法
                     commit('SET_TOKEN', token);
                     setToken(token);
                     resolve();
@@ -46,6 +47,16 @@ const actions ={
         //清除cookie里面的token
         removeToken();
         removeCurrentUser();
+    },
+    //注册
+    createUser({username,password}){
+        return new Promise((resolve,reject)=>{
+        createUserRequest(username,password).then(res=>{
+
+            console.log(res)
+            resolve(res);
+        }).catch(error=>{reject(error)})
+        })
     },
     // 获取当前用户
     fetchCurrentUser({commit}){

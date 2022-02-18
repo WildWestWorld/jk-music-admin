@@ -3,7 +3,7 @@
   <q-btn @click="logout">退出</q-btn>
 </template>
 
-<script>
+<script >
 import {useStore} from "vuex";
 import {computed} from "vue";
 
@@ -11,6 +11,7 @@ export default {
   name: "Index",
   setup(){
     const store =useStore();
+
     return{
       nickname:computed(()=> store.state.user.nickname),
       //执行完vuex里面的'logout'后使用window.location.reload()刷新页面

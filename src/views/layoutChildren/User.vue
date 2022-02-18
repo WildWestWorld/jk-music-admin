@@ -1,76 +1,78 @@
 <template>
-<div class="page">
+  <div class="page">
 
-  <div class="q-mt-md q-mb-md">
-    <q-btn color="primary" label="添加用户" />
-  </div>
+    <div class="q-mt-md q-mb-md">
+      <q-btn color="primary" label="添加用户" @click="toggleDialog()"/>
+    </div>
 
-  <q-table
-      title="Treats"
-      :rows="rows"
-      :columns="columns"
-      row-key="name"
-      v-model:pagination="pagination"
-  />
-
-  <div class="row justify-center q-mt-md">
-    <q-pagination
-        v-model="pagination.page"
-        color="grey-8"
-        :max="pagesNumber"
-        size="sm"
+    <q-table
+        title="Treats"
+        :rows="rows"
+        :columns="columns"
+        row-key="name"
+        v-model:pagination="pagination"
     />
+
+    <div class="row justify-center q-mt-md">
+      <q-pagination
+          v-model="pagination.page"
+          color="grey-8"
+          :max="pagesNumber"
+          size="sm"
+      />
+      <CreateUserDialog ref="RefChildren"></CreateUserDialog>
+    </div>
   </div>
-</div>
 </template>
 
-<script>
-import {computed,ref} from "vue";
+<script setup>
+import {computed, ref, onMounted, defineComponent} from "vue";
 import {getPageByUsername} from "../../api/user.js";
 
-export default {
-  name: "User",
-  setup(){
-    const columns = [
-      { label: 'Id', field: 'id',sortable: true,align: 'left'},
-      { label: '用户名', field: 'username', sortable: true,align: 'left'},
-      { label: '昵称', field: 'nickname', sortable: true,align: 'left'},
-    ]
+import CreateUserDialog from "../../components/user/CreateUserDialog.vue";
 
-    const rows=ref([])
+const columns = [
+  {label: 'Id', field: 'id', sortable: true, align: 'left'},
+  {label: '用户名', field: 'username', sortable: true, align: 'left'},
+  {label: '昵称', field: 'nickname', sortable: true, align: 'left'},
+]
+const rows = ref([])
 
-    const pagination = ref({
-      sortBy: 'desc',
-      descending: false,
-      //默认打开页面在第几页
-      page: 1,
-      //默认每页多少个
-      rowsPerPage: 5
-      // rowsNumber: xx if getting data from a server
-    })
+const pagination = ref({
+  sortBy: 'desc',
+  descending: false,
+  //默认打开页面在第几页
+  page: 1,
+  //默认每页多少个
+  rowsPerPage: 5
+  // rowsNumber: xx if getting data from a server
+})
 
-    //函数区
-    const fetchData=()=>{
-      getPageByUsername(pagination.page,pagination.rowsPerPage,"").then(res=>{
-        console.log(res);
-        rows.value=res.data.records;
-      })
-    }
-    fetchData();
-    return {
 
-      columns,
-      rows,
-      pagination,
-      pagesNumber: computed(() => Math.ceil(rows.length / pagination.value.rowsPerPage))
-    }
-  }
+//子组件
+const RefChildren = ref(null)
+
+const pagesNumber = computed(() => Math.ceil(rows.length / pagination.value.rowsPerPage))
+//父调子
+const toggleDialog =()=>{
+  RefChildren.value.togglePrompt();
 }
+
+const fetchData = () => {
+    getPageByUsername(pagination.page, pagination.rowsPerPage, "").then(res => {
+    console.log(res);
+    rows.value = res.data.records;
+  })
+}
+
+onMounted(fetchData);
+
+
 </script>
 
 
 <style scoped>
-.page{
+.page {
   padding: 30px
 }
 </style>

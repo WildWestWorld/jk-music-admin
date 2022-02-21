@@ -4,8 +4,9 @@ import request from "./request.js";
 export const login= (username,password)=>{
     return request.post('/tokens',{username,password})
 }
-export const createUserRequest= (username,password)=>{
-    return request.post('/users',{username,password})
+//该post方法，传入的是个对象
+export const createUserRequest= (user)=>{
+    return request.post('/users',user)
 }
 export const getPageByUsername=( pageNum,pageSize,searchWord)=>{
     return request.get("/users/pages",{params:{ pageNum,pageSize,searchWord}})

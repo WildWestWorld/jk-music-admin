@@ -1,6 +1,6 @@
 import axios from 'axios'
 import store from '../store'
-import { Notify} from 'quasar';
+import {Notify} from 'quasar';
 const request = axios.create({
     baseURL: '/api',  // 注意！！ 这里是全局统一加上了 '/api' 前缀，也就是说所有接口都会加上'/api'前缀在，页面里面写接口的时候就不要加 '/api'了，否则会出现2个'/api'，类似 '/api/api/user'这样的报错，切记！！！
     timeout: 5000
@@ -52,16 +52,28 @@ request.interceptors.response.use(
     }
 );
 const handleErrorResponse = (response)=>{
-    if(response.status ===401||403){
+
+    if(response.status ===401||response.status ===403){
         store.dispatch('logout').then(()=>{
-            
+            window.location.reload()
         });
     }
-    Notify.create({
-        type:'negative',
-        message:response.data.message,
-        position:'top'
-    })
+    if (response.data instanceof Array){
+        response.data.forEach(item=>{
+            Notify.create({
+                type:'negative',
+                message:item.message,
+                position:'top'
+            })
+        })
+    }else {
+        Notify.create({
+            type:'negative',
+            message:response.data.message,
+            position:'top'
+        })
+    }
+
 };
 
 export default request

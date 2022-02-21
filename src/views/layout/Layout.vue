@@ -37,6 +37,7 @@
 
               v-for="item in layoutChildren"
               :key="item.meta.title"
+              @click="pushRouter(item.path)"
 
               :active="item.name === route.name"
               active-class="my-menu-link"
@@ -73,7 +74,7 @@ import {computed} from "vue";
 
 import {layoutChildren} from "../../router";
 import {useRoute} from "vue-router";
-
+import router from '../../router';
 
 export default {
   name: "Layout",
@@ -87,7 +88,10 @@ export default {
     const store =useStore();
     //使用route里面的route.name 也就是当前页面的路径
     const route =useRoute();
-
+    //页面跳转
+    const pushRouter= (path)=>{
+      router.push({path})
+    }
     return {
       nicknameFirstWord:computed(()=>{
 
@@ -102,7 +106,8 @@ export default {
       menuController,
       //这个值来自于router文件
       layoutChildren,
-      route
+      route,
+      pushRouter
     }
 //setup止
   }

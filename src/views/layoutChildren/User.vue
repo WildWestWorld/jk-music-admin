@@ -10,6 +10,7 @@
         :rows="rows"
         :columns="columns"
         row-key="name"
+
         v-model:pagination="pagination"
     />
 
@@ -20,7 +21,7 @@
           :max="pagesNumber"
           size="sm"
       />
-      <CreateUserDialog ref="RefChildren"></CreateUserDialog>
+      <CreateUserDialog ref="RefChildren"  @fetchData="fetchData">></CreateUserDialog>
     </div>
   </div>
 </template>
@@ -58,12 +59,17 @@ const toggleDialog =()=>{
   RefChildren.value.togglePrompt();
 }
 
+
+
+
+
 const fetchData = () => {
     getPageByUsername(pagination.page, pagination.rowsPerPage, "").then(res => {
     console.log(res);
     rows.value = res.data.records;
   })
 }
+
 
 onMounted(fetchData);
 

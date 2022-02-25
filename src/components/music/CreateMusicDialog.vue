@@ -7,16 +7,16 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="username" label="用户名" autofocus />
+        <q-input dense v-model="name" label="音乐名" autofocus />
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="password"  label="密码" autofocus @keyup.enter="prompt = false" />
+        <q-input dense v-model="description"  label="描述" autofocus @keyup.enter="prompt = false" />
       </q-card-section>
 
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn  label="确认" color="primary" v-close-popup @click="createUser(username.value,password.value)"/>
+        <q-btn  label="确认" color="primary" v-close-popup @click="createMusic(name.value,description.value)"/>
         <q-btn flat label="取消" v-close-popup  />
       </q-card-actions>
     </q-card>
@@ -30,15 +30,17 @@ import { defineExpose } from 'vue'
 
 import {useStore} from "vuex";
 import {useQuasar} from "quasar";
-import {createUserRequest, getPageByUsername} from "../../api/user.js";
+import {createUserRequest} from "../../api/user.js";
+import {createMusicRequest} from "../../api/music.js";
+
 
 
 const alert= ref(false);
 const confirm = ref(false);
 
 const prompt =ref(false);
-const username =ref('');
-const password =ref('');
+const name =ref('');
+const description =ref('');
 
 const $q = useQuasar()
 
@@ -52,10 +54,10 @@ const fetchDataFromFather = ()=>{
 
 
 
-const createUser = ()=>{
+const createMusic = ()=>{
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
-  const user={username:username.value,password:password.value};
-  createUserRequest(user).then(res=>{console.log(res);fetchDataFromFather();$q.notify({message:'创建成功',position:"top",type:'positive',});})
+  const music={name:name.value,description:description.value};
+  createMusicRequest(music).then(res=>{console.log(res);fetchDataFromFather();$q.notify({message:'创建成功',position:"top",type:'positive',});})
 
 
 }
@@ -65,14 +67,16 @@ const togglePrompt =()=>{
   //转换对话框的显示状态
   prompt.value = !prompt.value
   //清空input
-  username.value =''
-  password.value=''
+  name.value =''
+  description.value=''
 }
 
 //暴露函数给父组件
-  defineExpose({
-    togglePrompt
-  })
+defineExpose({
+  togglePrompt
+})
+
+
 
 </script>
 

@@ -2,7 +2,7 @@
   <div class="page">
 
     <div class="q-mt-md q-mb-md">
-      <q-btn color="primary" label="添加用户" @click="toggleDialog()"/>
+      <q-btn color="primary" label="添加音乐" @click="toggleDialog()"/>
     </div>
 
     <q-table
@@ -10,6 +10,7 @@
         :rows="rows"
         :columns="columns"
         row-key="name"
+        @update:pagination="updateData"
 
         v-model:pagination="pagination"
 
@@ -18,7 +19,6 @@
 
 
     >
-
       <template v-slot:body-cell-operation="props">
         <q-td :props="props">
           <div class="q-mt-md q-mb-md">
@@ -26,6 +26,8 @@
           </div>
         </q-td>
       </template>
+
+
 
     </q-table>
 
@@ -37,7 +39,7 @@
           size="sm"
           @click="updateData"
       />
-      <CreateUserDialog ref="RefChildren" @fetchData="fetchData">></CreateUserDialog>
+      <CreateMusicDialog ref="RefChildren" @fetchData="fetchData">></CreateMusicDialog>
     </div>
   </div>
 </template>
@@ -47,12 +49,14 @@ import {computed, ref, onMounted, defineComponent} from "vue";
 import {getPageByUsername} from "../../api/user.js";
 import {nextTick,watch,watchEffect, toRefs} from 'vue'
 
-import CreateUserDialog from "../../components/user/CreateUserDialog.vue";
+import CreateMusicDialog from "../../components/music/CreateMusicDialog.vue";
+import {getPageByMusicName} from "../../api/music.js";
 
 const columns = [
   {name:"id",label: 'Id', field: 'id', sortable: true, align: 'left'},
-  {name:"username",label: '用户名', field: 'username', sortable: true, align: 'left'},
-  {name:"nickname",label: '昵称', field: 'nickname', sortable: true, align: 'left'},
+  {name:"name",label: '歌曲名', field: 'name', sortable: true, align: 'left'},
+  {name:"description",label: '简介', field: 'description', sortable: true, align: 'left'},
+  {name:"musicState",label: '上架状态', field: 'musicState', sortable: true, align: 'left'},
   {name:"operation",label: '操作', field: 'operation', align: 'left'},
 
 ]
@@ -113,8 +117,8 @@ const updateData = () => {
 
 // 多值监听
 watch([pagination,current],([newPagination,newCurrent],[oldPagination,oldCurrent])=>{
-    console.log(newCurrent)
-  getPageByUsername(newCurrent, newPagination.rowsPerPage, "").then(res => {
+  console.log(newCurrent)
+  getPageByMusicName(newCurrent, newPagination.rowsPerPage, "").then(res => {
     console.log(pagination.value.rowsPerPage)
     console.log(res);
     rows.value = res.data.records;
@@ -132,12 +136,12 @@ watch([pagination,current],([newPagination,newCurrent],[oldPagination,oldCurrent
 
 const getPaginationLabel =(firstRowIndex, endRowIndex, totalRowsNumber)=>{
 
-      // firstRowIndex=pagination.value.rowsPerPage*(current.value-1)+1
-      // endRowIndex= pagination.value.rowsPerPage*(current.value-1) + rows.value.length
-      //
-      totalRowsNumber=total.value;
+  // firstRowIndex=pagination.value.rowsPerPage*(current.value-1)+1
+  // endRowIndex= pagination.value.rowsPerPage*(current.value-1) + rows.value.length
+  //
+  // totalRowsNumber=total.value;
 
-      // return `${firstRowIndex}-${endRowIndex} of total:${totalRowsNumber}`
+  // return `${firstRowIndex}-${endRowIndex} of total:${totalRowsNumber}`
 
   return `TOTAL:${totalRowsNumber}`
 }
@@ -145,7 +149,7 @@ const getPaginationLabel =(firstRowIndex, endRowIndex, totalRowsNumber)=>{
 
 const fetchData = () => {
 
-  getPageByUsername(pagination.value.page, pagination.value.rowsPerPage, "").then(res => {
+  getPageByMusicName(pagination.value.page, pagination.value.rowsPerPage, "").then(res => {
     console.log(pagination.value.rowsPerPage)
     console.log(res);
     rows.value = res.data.records;

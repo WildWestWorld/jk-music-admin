@@ -15,6 +15,11 @@ export const layoutChildren=[{
   name:"User",
   meta:{title:'用户管理', icon:'manage_accounts'},
   component: ()=>import("../views/layoutChildren/User.vue"),
+},{
+  path: '/music',
+  name:"Music",
+  meta:{title:'音乐管理', icon:'music_note'},
+  component: ()=>import("../views/layoutChildren/Music.vue"),
 },
   //children止
 ]

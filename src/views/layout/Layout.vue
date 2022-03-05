@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import {onMounted, ref} from 'vue'
 import {useStore} from "vuex";
 import {computed} from "vue";
 
@@ -92,10 +92,12 @@ export default {
     const pushRouter= (path)=>{
       router.push({path})
     }
+    onMounted(store.dispatch("fetchSiteSetting"))
+
     return {
       nicknameFirstWord:computed(()=>{
-
         return store.getters.nicknameFirstWord}),
+
       //引入该变量
       leftDrawerOpen,
       //方法，就是把leftDrawerOpen值变为相反的值，这个值就是设定菜单是否展开

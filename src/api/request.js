@@ -53,7 +53,7 @@ request.interceptors.response.use(
 );
 const handleErrorResponse = (response)=>{
 
-    if(response.status ===401||response.status ===403){
+    if(response.status ===406||response.status ===403){
         store.dispatch('logout').then(()=>{
             window.location.reload()
         });

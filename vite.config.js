@@ -21,7 +21,8 @@ export default defineConfig({
         target: 'https://jk-music-1577517-1309371796.ap-shanghai.run.tcloudbase.com',     //代理的目标地址
         changeOrigin: true,              //是否设置同源，输入是的
         rewrite: (path) => path.replace(/^\/api/, ''),
-      }
+      },
+
     }
   }
 });

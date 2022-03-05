@@ -1,9 +1,9 @@
 
 
-//存储初值
+
 import {getCurrentUser, getToken, removeCurrentUser, removeToken, setCurrentUser, setToken} from "../../utils/auth.js";
 import login, {createUserRequest, getCurrentUserByToken} from "../../api/user.js";
-
+//存储初值
 const state = () => ({
     //getToken来自auth，用的是依赖jk-cookie方法来获取token，然后吧token放在vuex里面
     token:getToken(),
@@ -12,7 +12,7 @@ const state = () => ({
     roles:[],
     currentUser:getCurrentUser(),
 });
-//存取被函数处理后的值
+//存储被函数处理后的值
 const getters ={
     nicknameFirstWord:(state)=>{
 

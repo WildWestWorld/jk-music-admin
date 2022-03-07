@@ -16,25 +16,40 @@
 
 <script setup>
 import CosUploader from "./uploaderComponent/useCosUploader.js";
-import {ref,defineProps,defineEmits} from "vue"
+import {ref,defineProps,defineEmits,onMounted,nextTick} from "vue"
 
-const props = defineProps({label:{type:String}})
+const props = defineProps(
+    {
+    label:{type:String},
+      fileEdit:{type:Object}
+    })
+
+
+
 const emit = defineEmits(['uploadedGF'])
 
 
 const file =ref(null)
+
+
 
 const reUpload =()=>{
   file.value=null;
   emit('uploadedGF',null)
 
 }
+const fileFromFather =()=>{
+    file.value= props.fileEdit
+}
 
 const uploadedF = (res)=>{
   file.value = res;
   emit('uploadedGF',file.value)
   console.log(file)
+
 }
+
+onMounted(fileFromFather)
 
 </script>
 

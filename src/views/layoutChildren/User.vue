@@ -22,7 +22,7 @@
       <template v-slot:body-cell-operation="props">
         <q-td :props="props">
           <div class="q-mt-md q-mb-md">
-            <q-btn flat color="primary" label="编辑" />
+            <q-btn flat color="primary" label="编辑" @click="edit(props.row)"/>
           </div>
         </q-td>
       </template>
@@ -37,7 +37,7 @@
           size="sm"
           @click="updateData"
       />
-      <CreateUserDialog ref="RefChildren" @fetchData="fetchData">></CreateUserDialog>
+      <CreateUserDialog ref="RefChildren" @fetchData="fetchData" :editRow="editRow"></CreateUserDialog>
     </div>
   </div>
 </template>
@@ -71,7 +71,7 @@ const pagination = ref({
 const current =ref(1);
 const allNum =ref(1);
 const sortNum =ref([ 3, 5, 7, 10, 15, 20, 25, 50 ]);
-
+const editRow =ref(null)
 
 //子组件
 const RefChildren = ref(null)
@@ -156,6 +156,12 @@ const fetchData = () => {
 
 
 onMounted(fetchData);
+
+const edit =(row)=>{
+  editRow.value =row;
+  console.log(editRow.value)
+}
+
 
 
 </script>

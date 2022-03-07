@@ -9,7 +9,7 @@
         title="Treats"
         :rows="rows"
         :columns="columns"
-        row-key="name"
+        row-key="id"
         @update:pagination="updateData"
 
         v-model:pagination="pagination"
@@ -17,12 +17,45 @@
         v-model:rows-per-page-options="sortNum"
         :pagination-label="getPaginationLabel"
 
-
     >
+<!--      <template v-slot:body-cell-你想使用插槽columns的名字="props">-->
+
+      <template v-slot:body-cell-musicState="props">
+        <q-td :props="props" key="id">
+          <div>
+            <q-badge outline :color="musicStatusColor[props.value]" :label="props.value" />
+          </div>
+        </q-td>
+      </template>
+
+
       <template v-slot:body-cell-operation="props">
         <q-td :props="props">
           <div class="q-mt-md q-mb-md">
-            <q-btn flat color="primary" label="编辑" />
+            <q-btn-dropdown color="primary" label="编辑"  @click="edit(props.row)" split>
+
+            <q-list>
+              <q-item clickable v-close-popup v-if="props.row.musicState !== '已上架'" @click="publishMusic(props.row.id)">
+                <q-item-section>
+                  <q-item-label>上架</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-close-popup  v-if="props.row.musicState !== '已下架'" @click="closedMusic(props.row.id)">
+                <q-item-section>
+                  <q-item-label>下架</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-close-popup  v-if="props.row.musicState !== '待上架'" @click="freeMusic(props.row.id)">
+                <q-item-section>
+                  <q-item-label>闲置</q-item-label>
+                </q-item-section>
+              </q-item>
+
+            </q-list>
+            </q-btn-dropdown>
+
           </div>
         </q-td>
       </template>
@@ -39,7 +72,7 @@
           size="sm"
           @click="updateData"
       />
-      <CreateMusicDialog ref="RefChildren" @fetchData="fetchData">></CreateMusicDialog>
+      <CreateMusicDialog ref="RefChildren" @fetchData="fetchData" :rowData="rowData">></CreateMusicDialog>
     </div>
   </div>
 </template>
@@ -50,7 +83,16 @@ import {getPageByUsername} from "../../api/user.js";
 import {nextTick,watch,watchEffect, toRefs} from 'vue'
 
 import CreateMusicDialog from "../../components/music/CreateMusicDialog.vue";
-import {getPageByMusicName} from "../../api/music.js";
+import {
+  changeMusicStateToClosed,
+  changeMusicStateToPublic,
+  changeMusicStateToWaited,
+  getPageByMusicName
+} from "../../api/music.js";
+import {musicStatusColor} from '../../utils/musicSlotColorEnum.js';
+import {useQuasar} from "quasar";
+
+const $q = useQuasar()
 
 const columns = [
   {name:"id",label: 'Id', field: 'id', sortable: true, align: 'left'},
@@ -76,6 +118,8 @@ const current =ref(1);
 const allNum =ref(1);
 const sortNum =ref([ 3, 5, 7, 10, 15, 20, 25, 50 ]);
 
+const rowData =ref(null)
+
 
 //子组件
 const RefChildren = ref(null)
@@ -85,6 +129,13 @@ const pagesNumber = computed(() => Math.ceil(total.value / pagination.value.rows
 const toggleDialog = () => {
   RefChildren.value.togglePrompt();
 }
+
+//父调子
+const toggleDialogEdit = () => {
+  RefChildren.value.togglePromptEdit();
+}
+
+
 //暂时废弃
 const updateData = () => {
 
@@ -115,6 +166,7 @@ const updateData = () => {
 // })
 
 
+
 // 多值监听
 watch([pagination,current],([newPagination,newCurrent],[oldPagination,oldCurrent])=>{
   console.log(newCurrent)
@@ -139,7 +191,7 @@ const getPaginationLabel =(firstRowIndex, endRowIndex, totalRowsNumber)=>{
   // firstRowIndex=pagination.value.rowsPerPage*(current.value-1)+1
   // endRowIndex= pagination.value.rowsPerPage*(current.value-1) + rows.value.length
   //
-  // totalRowsNumber=total.value;
+  totalRowsNumber=total.value;
 
   // return `${firstRowIndex}-${endRowIndex} of total:${totalRowsNumber}`
 
@@ -149,7 +201,7 @@ const getPaginationLabel =(firstRowIndex, endRowIndex, totalRowsNumber)=>{
 
 const fetchData = () => {
 
-  getPageByMusicName(pagination.value.page, pagination.value.rowsPerPage, "").then(res => {
+  getPageByMusicName(current.value, pagination.value.rowsPerPage, "").then(res => {
     console.log(pagination.value.rowsPerPage)
     console.log(res);
     rows.value = res.data.records;
@@ -161,6 +213,40 @@ const fetchData = () => {
 
 onMounted(fetchData);
 
+const edit =(row)=>{
+  console.log(current.value)
+  rowData.value =row;
+  console.log(rowData.value)
+
+  nextTick(()=>{
+    toggleDialogEdit()
+  })
+
+}
+
+const publishMusic=(id)=>{
+  changeMusicStateToPublic(id).then(res=>{
+    console.log(res)
+    fetchData();
+    $q.notify({message: '上架成功', position: "top", type: 'positive',});
+  })
+}
+
+const closedMusic =(id)=>{
+  changeMusicStateToClosed(id).then(res=>{
+    console.log(res)
+    fetchData();
+    $q.notify({message: '下架成功', position: "top", type: 'positive',});
+  })
+}
+
+const freeMusic =(id)=>{
+  changeMusicStateToWaited(id).then(res=>{
+    console.log(res)
+    fetchData();
+    $q.notify({message: '闲置成功', position: "top", type: 'positive',});
+  })
+}
 
 </script>
 

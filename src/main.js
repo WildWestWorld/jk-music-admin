@@ -3,6 +3,7 @@ import { Quasar,Notify} from 'quasar';
 import router from './router';
 import store from './store/index.js'
 import './permission'
+import ElementPlus from 'element-plus'
 
 // Import icon libraries
 import '@quasar/extras/material-icons/material-icons.css';
@@ -19,6 +20,7 @@ myApp.use(Quasar, {
   plugins: {Notify}, // import Quasar plugins and add here
 
 })
+myApp.use(ElementPlus, { zIndex: 9999 })
 
 
 myApp.mount('#app')

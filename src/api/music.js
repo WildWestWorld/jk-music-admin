@@ -1,7 +1,7 @@
 import request from "./request.js";
 
-export const getMusicList =()=>{
-    return request.get("/music")
+export const getMusicList =(searchWord)=>{
+    return request.get("/music",{params:{searchWord}})
 }
 
 export const getPageByMusicName=( pageNum,pageSize,searchWord)=>{

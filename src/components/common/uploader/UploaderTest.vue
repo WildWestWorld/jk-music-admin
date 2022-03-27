@@ -13,7 +13,7 @@
 <script setup>
 import {ref} from 'vue';
 import COS from 'cos-js-sdk-v5'
-import {finishUpload, initUpload} from "../../api/file.js";
+import {finishUpload, initUpload} from "../../../api/file.js";
 import { computed } from 'vue'
 import md5 from "md5";
 import {useStore} from "vuex";

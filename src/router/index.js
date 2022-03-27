@@ -20,7 +20,13 @@ export const layoutChildren=[{
   name:"Music",
   meta:{title:'音乐管理', icon:'music_note'},
   component: ()=>import("../views/layoutChildren/Music.vue"),
+},{
+  path: '/artist',
+  name:"Artist",
+  meta:{title:'歌手管理', icon:'mic'},
+  component: ()=>import("../views/layoutChildren/Artist.vue"),
 },
+
   //children止
 ]
 

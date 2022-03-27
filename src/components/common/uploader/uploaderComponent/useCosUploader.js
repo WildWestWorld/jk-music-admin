@@ -4,7 +4,7 @@ import {createUploaderComponent, useQuasar} from 'quasar';
 import { computed, ref ,defineEmits} from 'vue';
 import md5 from 'md5';
 import { useStore } from 'vuex';
-import {finishUpload, initUpload} from "../../../api/file.js";
+import {finishUpload, initUpload} from "../../../../api/file.js";
 
 
 //用于自定义上传组件

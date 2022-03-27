@@ -8,8 +8,8 @@
 <script >
 import {useStore} from "vuex";
 import {computed,ref} from "vue";
-import Uploader from "../../components/common/UploaderTest.vue";
-import CosUploader from "../../components/common/uploaderComponent/useCosUploader.js";
+import Uploader from "../../components/common/uploader/UploaderTest.vue";
+import CosUploader from "../../components/common/uploader/uploaderComponent/useCosUploader.js";
 
 export default {
   name: "Index",

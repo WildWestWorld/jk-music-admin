@@ -43,7 +43,9 @@ request.interceptors.response.use(
         return res;
     },
     error => {
-
+        if(!error.response){
+            notify.error("请求错误，请联系后台管理员")
+        }
         //自定义的函数,就在下面，根据状态码 处理不同的错误
          handleErrorResponse(error.response)
 

@@ -3,30 +3,24 @@
   <q-dialog v-model="prompt" persistent>
     <q-card style="min-width: 350px">
       <q-card-section>
-        <div class="text-h6">新增音乐</div>
+        <div class="text-h6">新增歌手</div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="name" label="音乐名" autofocus lazy-rules
-                 :rules="[ val => val && val.length > 0 || '请输入音乐名']"/>
+        <q-input dense v-model="name" label="歌手名字" autofocus lazy-rules
+                 :rules="[ val => val && val.length > 0 || '请输入歌手名字']"/>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="description" label="描述" autofocus @keyup.enter="prompt = false"/>
-      </q-card-section>
-
-
-      <q-card-section class="q-pt-none">
-        <ArtistSelectionElementUIV2 @ArtistSelectionElementUI="inputSelectArtistList" :artistListFromFather="artistIdListFromFather"></ArtistSelectionElementUIV2>
+        <q-input dense v-model="remark" label="歌手描述" autofocus @keyup.enter="prompt = false"/>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
         <Uploader :label="label" @uploadedGF="uploadedGF" :fileEdit="fileEdit"></Uploader>
       </q-card-section>
 
-
       <q-card-actions align="right" class="text-primary">
-        <q-btn label="确认" color="primary" v-close-popup @click="isEdit?editMusic():createMusic()"/>
+        <q-btn label="确认" color="primary" v-close-popup @click="isEdit?editArtist():createArtist()"/>
         <q-btn flat label="取消" v-close-popup/>
       </q-card-actions>
     </q-card>
@@ -45,10 +39,7 @@ import {createMusicRequest, updateMusic} from "../../api/music.js";
 
 import Uploader from "../common/uploader/Uploader.vue"
 import CosUploader from "../common/uploader/uploaderComponent/useCosUploader.js";
-import ArtistSelectionElementUI from "../common/artistSelection/ArtistSelectionElementUI.vue"
-import ArtistSelectionElementUIV2 from "../common/artistSelection/ArtistSelectionElementUIV2.vue"
-
-import ArtistSelection from "../common/artistSelection/ArtistSelection.vue"
+import {createArtistRequest, updateArtist} from "../../api/artist.js";
 
 
 const alert = ref(false);
@@ -56,19 +47,18 @@ const confirm = ref(false);
 
 const prompt = ref(false);
 const name = ref('');
-const description = ref('');
+const remark = ref('');
 const file = ref(null)
 const fileId =ref(null)
 const fileEdit =ref(null)
 const id =ref(null)
-const music = ref(props.rowData||{name: '', description: '', file: null})
-const artistIdListFromChild=ref([]);
-const artistIdListFromFather=ref([]);
+const artist = ref(props.rowData||{name: '', remark: '', file: null})
+
 const isEdit =ref(null)
 
 
 
-const label = ref('音乐上传');
+const label = ref('歌手封面上传');
 
 const $q = useQuasar()
 
@@ -86,11 +76,6 @@ const props = defineProps(
 )
 
 
-const inputSelectArtistList=(artistIdList)=>{
-  artistIdListFromChild.value=artistIdList
-  console.log(artistIdListFromChild.value)
-}
-
 
 const uploadedGF = (res) => {
   file.value = res;
@@ -102,13 +87,13 @@ const uploadedGF = (res) => {
 }
 
 
-const createMusic = () => {
+const createArtist = () => {
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
-  music.value = {name: name.value, description: description.value, fileId:fileId.value,file: file.value,artistIdList:artistIdListFromChild.value};
+  artist.value = {name: name.value, remark: remark.value, photoId:fileId.value,photo: file.value};
 
 
 
-  createMusicRequest(music.value).then(res => {
+  createArtistRequest(artist.value).then(res => {
     console.log(res);
     fetchDataFromFather();
     $q.notify({message: '创建成功', position: "top", type: 'positive',});
@@ -119,10 +104,10 @@ const createMusic = () => {
 
 }
 
-const editMusic = ()=>{
-  music.value = {id:id.value,name: name.value, description: description.value, fileId:fileId.value,file: file.value,artistIdList:artistIdListFromChild.value};
+const editArtist = ()=>{
+  artist.value = {id:id.value,name: name.value, remark: remark.value, photoId:fileId.value,file: file.value};
 
-  updateMusic(music.value.id,music.value).then(res=>{
+  updateArtist(artist.value.id,artist.value).then(res=>{
     console.log(res)
 
     fetchDataFromFather();
@@ -140,8 +125,6 @@ const togglePrompt = () => {
   fileId.value=null;
   fileEdit.value=null;
   id.value =null;
-  artistIdListFromChild.value=null;
-  artistIdListFromFather.value=null;
 
   console.log(isEdit.value)
   //转换对话框的显示状态
@@ -151,7 +134,7 @@ const togglePrompt = () => {
 
   //清空input
   name.value = ''
-  description.value = ''
+  remark.value = ''
 
 
 
@@ -161,32 +144,29 @@ const togglePromptEdit =()=>{
 
   isEdit.value=true;
   name.value='';
-  description.value='';
+  remark.value='';
 
   file.value=null;
   fileId.value=null;
   fileEdit.value=null;
   id.value =null;
-  artistIdListFromChild.value=null
 
 
   //转换对话框的显示状态
   prompt.value = !prompt.value
 
   name.value=props.rowData.name;
-  description.value=props.rowData.description;
-  if (props.rowData.file !== null){
-    file.value=props.rowData.file;
-    fileId.value=props.rowData.file.id;
+  remark.value=props.rowData.remark;
+  if (props.rowData.photo !== null){
+    file.value=props.rowData.photo;
+    fileId.value=props.rowData.photo.id;
   }
 
-  fileEdit.value=props.rowData.file
+  fileEdit.value=props.rowData.photo
 
   id.value = props.rowData.id;
-  artistIdListFromChild.value=props.rowData.artistVoList.map(item=>item.id)
-  artistIdListFromFather.value=artistIdListFromChild.value
 
-  console.log(artistIdListFromChild.value)
+
 }
 
 

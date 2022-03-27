@@ -2,7 +2,7 @@
   <div class="page">
 
     <div class="q-mt-md q-mb-md">
-      <q-btn color="primary" label="添加音乐" @click="toggleDialog()"/>
+      <q-btn color="primary" label="添加歌手" @click="toggleDialog()"/>
     </div>
 
     <q-table
@@ -18,9 +18,9 @@
         :pagination-label="getPaginationLabel"
 
     >
-<!--      <template v-slot:body-cell-你想使用插槽columns的名字="props">-->
+      <!--      <template v-slot:body-cell-你想使用插槽columns的名字="props">-->
 
-      <template v-slot:body-cell-musicState="props">
+      <template v-slot:body-cell-artistState="props">
         <q-td :props="props" key="id">
           <div>
             <q-badge outline :color="musicStatusColor[props.value]" :label="props.value" />
@@ -34,26 +34,26 @@
           <div class="q-mt-md q-mb-md">
             <q-btn-dropdown color="primary" label="编辑"  @click="edit(props.row)" split>
 
-            <q-list>
-              <q-item clickable v-close-popup v-if="props.row.musicState !== '已上架'" @click="publishMusic(props.row.id)">
-                <q-item-section>
-                  <q-item-label>上架</q-item-label>
-                </q-item-section>
-              </q-item>
+              <q-list>
+                <q-item clickable v-close-popup v-if="props.row.artistState !== '已上架'" @click="publishArtist(props.row.id)">
+                  <q-item-section>
+                    <q-item-label>上架</q-item-label>
+                  </q-item-section>
+                </q-item>
 
-              <q-item clickable v-close-popup  v-if="props.row.musicState !== '已下架'" @click="closedMusic(props.row.id)">
-                <q-item-section>
-                  <q-item-label>下架</q-item-label>
-                </q-item-section>
-              </q-item>
+                <q-item clickable v-close-popup  v-if="props.row.artistState !== '已下架'" @click="closedArtist(props.row.id)">
+                  <q-item-section>
+                    <q-item-label>下架</q-item-label>
+                  </q-item-section>
+                </q-item>
 
-              <q-item clickable v-close-popup  v-if="props.row.musicState !== '待上架'" @click="freeMusic(props.row.id)">
-                <q-item-section>
-                  <q-item-label>闲置</q-item-label>
-                </q-item-section>
-              </q-item>
+                <q-item clickable v-close-popup  v-if="props.row.artistState !== '待上架'" @click="freeArtist(props.row.id)">
+                  <q-item-section>
+                    <q-item-label>闲置</q-item-label>
+                  </q-item-section>
+                </q-item>
 
-            </q-list>
+              </q-list>
             </q-btn-dropdown>
 
           </div>
@@ -72,7 +72,7 @@
           size="sm"
           @click="updateData"
       />
-      <CreateMusicDialog ref="RefChildren" @fetchData="fetchData" :rowData="rowData">></CreateMusicDialog>
+      <CreateArtistDialog ref="RefChildren" @fetchData="fetchData" :rowData="rowData"></CreateArtistDialog>
     </div>
   </div>
 </template>
@@ -82,9 +82,7 @@ import {computed, ref, onMounted, defineComponent} from "vue";
 import {getPageByUsername} from "../../api/user.js";
 import {nextTick,watch,watchEffect, toRefs} from 'vue'
 
-import CreateMusicDialog from "../../components/music/CreateMusicDialog.vue";
-import ArtistSelectionElementUI from "../../components/common/artistSelection/ArtistSelectionElementUI.vue"
-
+import CreateArtistDialog from "../../components/artist/CreateArtistDialog.vue";
 import {
   changeMusicStateToClosed,
   changeMusicStateToPublic,
@@ -92,15 +90,22 @@ import {
   getPageByMusicName
 } from "../../api/music.js";
 import {musicStatusColor} from '../../utils/musicSlotColorEnum.js';
+
 import {useQuasar} from "quasar";
+import {
+  changeArtistStateToClosed,
+  changeArtistStateToPublic,
+  changeArtistStateToWaited,
+  getPageByArtistName
+} from "../../api/artist.js";
 
 const $q = useQuasar()
 
 const columns = [
   {name:"id",label: 'Id', field: 'id', sortable: true, align: 'left'},
-  {name:"name",label: '歌曲名', field: 'name', sortable: true, align: 'left'},
-  {name:"description",label: '简介', field: 'description', sortable: true, align: 'left'},
-  {name:"musicState",label: '上架状态', field: 'musicState', sortable: true, align: 'left'},
+  {name:"name",label: '歌手名', field: 'name', sortable: true, align: 'left'},
+  {name:"remake",label: '歌手简介', field: 'remark', sortable: true, align: 'left'},
+  {name:"artistState",label: '歌手状态', field: 'artistState', sortable: true, align: 'left'},
   {name:"operation",label: '操作', field: 'operation', align: 'left'},
 
 ]
@@ -170,18 +175,18 @@ const updateData = () => {
 
 
 // 多值监听
-watch([pagination,current],([newPagination,newCurrent],[oldPagination,oldCurrent])=>{
-  console.log(newCurrent)
-  getPageByMusicName(newCurrent, newPagination.rowsPerPage, "").then(res => {
-    console.log(pagination.value.rowsPerPage)
-    console.log(res);
-    rows.value = res.data.records;
-    total.value = res.data.total;
-    sortNum.value=([ 3, 5, 7, 10, 15, 20, 25, 50,total.value]);
+    watch([pagination,current],([newPagination,newCurrent],[oldPagination,oldCurrent])=>{
+      console.log(newCurrent)
+      getPageByArtistName(newCurrent, newPagination.rowsPerPage, "").then(res => {
+        console.log(pagination.value.rowsPerPage)
+        console.log(res);
+        rows.value = res.data.records;
+        total.value = res.data.total;
+        sortNum.value=([ 3, 5, 7, 10, 15, 20, 25, 50,total.value]);
 
-    if (res.data.records === null){
-      current.value=1;
-    }
+        if (res.data.records === null){
+          current.value=1;
+        }
 
   })
 })
@@ -203,7 +208,7 @@ const getPaginationLabel =(firstRowIndex, endRowIndex, totalRowsNumber)=>{
 
 const fetchData = () => {
 
-  getPageByMusicName(current.value, pagination.value.rowsPerPage, "").then(res => {
+  getPageByArtistName(current.value, pagination.value.rowsPerPage, "").then(res => {
     console.log(pagination.value.rowsPerPage)
     console.log(res);
     rows.value = res.data.records;
@@ -226,24 +231,24 @@ const edit =(row)=>{
 
 }
 
-const publishMusic=(id)=>{
-  changeMusicStateToPublic(id).then(res=>{
+const publishArtist=(id)=>{
+  changeArtistStateToPublic(id).then(res=>{
     console.log(res)
     fetchData();
     $q.notify({message: '上架成功', position: "top", type: 'positive',});
   })
 }
 
-const closedMusic =(id)=>{
-  changeMusicStateToClosed(id).then(res=>{
+const closedArtist =(id)=>{
+  changeArtistStateToClosed(id).then(res=>{
     console.log(res)
     fetchData();
     $q.notify({message: '下架成功', position: "top", type: 'positive',});
   })
 }
 
-const freeMusic =(id)=>{
-  changeMusicStateToWaited(id).then(res=>{
+const freeArtist =(id)=>{
+  changeArtistStateToWaited(id).then(res=>{
     console.log(res)
     fetchData();
     $q.notify({message: '闲置成功', position: "top", type: 'positive',});

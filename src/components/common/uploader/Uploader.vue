@@ -20,7 +20,7 @@ import {ref,defineProps,defineEmits,onMounted,nextTick} from "vue"
 
 const props = defineProps(
     {
-    label:{type:String},
+      label:{type:String},
       fileEdit:{type:Object}
     })
 

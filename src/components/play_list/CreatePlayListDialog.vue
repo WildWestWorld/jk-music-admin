@@ -3,17 +3,29 @@
   <q-dialog v-model="prompt" persistent>
     <q-card style="min-width: 350px">
       <q-card-section>
-        <div class="text-h6">新增歌手</div>
+        <div class="text-h6">新增歌单</div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="name" label="歌手名字" autofocus lazy-rules
-                 :rules="[ val => val && val.length > 0 || '请输入歌手名字']"/>
+        <q-input dense v-model="name" label="歌单名字" autofocus lazy-rules
+                 :rules="[ val => val && val.length > 0 || '请输入歌单名字']"/>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="remark" label="歌手描述" autofocus @keyup.enter="prompt = false"/>
+        <q-input dense v-model="description" label="歌单描述" autofocus @keyup.enter="prompt = false"/>
       </q-card-section>
+
+      <q-card-section class="q-pt-none">
+        <q-toggle
+            v-model="special"
+            checked-icon="check"
+            color="pink"
+            unchecked-icon="clear"
+            label="是否设置该歌单为特色歌单"
+
+        />
+      </q-card-section>
+
 
       <q-card-section class="q-pt-none">
         <q-toggle
@@ -21,22 +33,28 @@
             checked-icon="check"
             color="bule"
             unchecked-icon="clear"
-            label="是否推荐该歌手"
+            label="是否推荐该歌单"
+            keep-color
 
         />
       </q-card-section>
+
+
 
       <q-card-section class="q-pt-none">
         <q-input v-show="recommended" dense v-model="recommendFactor" label="推荐指数" autofocus @keyup.enter="prompt = false"/>
       </q-card-section>
 
+      <q-card-section class="q-pt-none">
+        <MusicSelectionElementUIV2 @MusicSelectionElementUI="inputSelectMusicList" :musicListFromFather="musicIdListFromFather"></MusicSelectionElementUIV2>
+      </q-card-section>
 
       <q-card-section class="q-pt-none">
         <Uploader :label="label" @uploadedGF="uploadedGF" :fileEdit="fileEdit"></Uploader>
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn label="确认" color="primary" v-close-popup @click="isEdit?editArtist():createArtist()"/>
+        <q-btn label="确认" color="primary" v-close-popup @click="isEdit?editPlayList():createPlayList()"/>
         <q-btn flat label="取消" v-close-popup/>
       </q-card-actions>
     </q-card>
@@ -55,7 +73,11 @@ import {createMusicRequest, updateMusic} from "../../api/music.js";
 
 import Uploader from "../common/uploader/Uploader.vue"
 import CosUploader from "../common/uploader/uploaderComponent/useCosUploader.js";
+import MusicSelectionElementUIV2 from "../common/musicSelection/MusicSelectionElementUIV2.vue"
+
 import {createArtistRequest, updateArtist} from "../../api/artist.js";
+
+import {createPlayListRequest, updatePlayList} from "../../api/play_list.js";
 
 
 const alert = ref(false);
@@ -63,23 +85,26 @@ const confirm = ref(false);
 
 const prompt = ref(false);
 const name = ref('');
-const remark = ref('');
+const description=ref('');
 const file = ref(null)
 const fileId =ref(null)
 const fileEdit =ref(null)
 const id =ref(null)
 const recommendFactor=ref(null)
 const recommended=ref(null)
+const special=ref(false)
 
+const musicIdListFromChild=ref([]);
+const musicIdListFromFather=ref([]);
 
 
 const artist = ref(props.rowData||{name: '', remark: '', file: null})
-
+const playList=ref(null)
 const isEdit =ref(null)
 
 
 
-const label = ref('歌手封面上传');
+const label = ref('歌单封面上传');
 
 const $q = useQuasar()
 
@@ -108,13 +133,13 @@ const uploadedGF = (res) => {
 }
 
 
-const createArtist = () => {
+const createPlayList = () => {
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
-  artist.value = {name: name.value, remark: remark.value, photoId:fileId.value,photo: file.value,recommendFactor:recommendFactor.value,recommended:recommended.value};
+  playList.value = {name: name.value, description: description.value, coverId:fileId.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
 
 
 
-  createArtistRequest(artist.value).then(res => {
+  createPlayListRequest(playList.value).then(res => {
     console.log(res);
     fetchDataFromFather();
     $q.notify({message: '创建成功', position: "top", type: 'positive',});
@@ -125,14 +150,12 @@ const createArtist = () => {
 
 }
 
-const editArtist = ()=>{
-  artist.value = {id:id.value,name: name.value, remark: remark.value, photoId:fileId.value,file: file.value,recommendFactor:recommendFactor.value,recommended:recommended.value};
-
-  if (artist.value.recommended === false){
-    artist.value.recommendFactor =0;
+const editPlayList = ()=>{
+  playList.value = {id:id.value,name: name.value, description: description.value, coverId:fileId.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
+  if (playList.value.recommended === false){
+    playList.value.recommendFactor =0;
   }
-
-  updateArtist(artist.value.id,artist.value).then(res=>{
+  updatePlayList(playList.value.id,playList.value).then(res=>{
     console.log(res)
 
     fetchDataFromFather();
@@ -152,6 +175,8 @@ const togglePrompt = () => {
   id.value =null;
   recommended.value=false;
   recommendFactor.value=null;
+  special.value=false;
+
   console.log(isEdit.value)
   //转换对话框的显示状态
   prompt.value = !prompt.value
@@ -160,7 +185,7 @@ const togglePrompt = () => {
 
   //清空input
   name.value = ''
-  remark.value = ''
+  description.value = ''
 
 
 
@@ -170,7 +195,6 @@ const togglePromptEdit =()=>{
 
   isEdit.value=true;
   name.value='';
-  remark.value='';
 
   file.value=null;
   fileId.value=null;
@@ -181,21 +205,25 @@ const togglePromptEdit =()=>{
   prompt.value = !prompt.value
 
   name.value=props.rowData.name;
-  remark.value=props.rowData.remark;
+  description.value=props.rowData.description;
   if (props.rowData.photo !== null){
-    file.value=props.rowData.photo;
-    fileId.value=props.rowData.photo.id;
+    file.value=props.rowData.cover;
+    fileId.value=props.rowData.cover.id;
   }
 
-  fileEdit.value=props.rowData.photo
+  fileEdit.value=props.rowData.cover
 
   id.value = props.rowData.id;
   recommendFactor.value=props.rowData.recommendFactor
   recommended.value=props.rowData.recommended
+  special.value=props.rowData.special
 
 }
 
-
+const inputSelectMusicList=(musicIdList)=>{
+  musicIdListFromChild.value=musicIdList
+  console.log(musicIdListFromChild.value)
+}
 
 //暴露函数给父组件
 defineExpose({

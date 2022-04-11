@@ -53,6 +53,12 @@
                 </q-item-section>
               </q-item>
 
+              <q-item clickable v-close-popup  @click="openConfirmDialog(props.row.id)">
+                <q-item-section>
+                  <q-item-label>删除</q-item-label>
+                </q-item-section>
+              </q-item>
+
             </q-list>
             </q-btn-dropdown>
 
@@ -73,6 +79,21 @@
           @click="updateData"
       />
       <CreateMusicDialog ref="RefChildren" @fetchData="fetchData" :rowData="rowData">></CreateMusicDialog>
+
+      <q-dialog v-model="confirmDelete" persistent>
+        <q-card>
+          <q-card-section class="row items-center">
+            <q-avatar icon="warning" color="red" text-color="white" />
+            <span class="q-ml-sm">您确定要删除吗?</span>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn flat label="取消" color="primary" v-close-popup />
+            <q-btn flat label="确定" color="primary" v-close-popup @click="deleteMusicById()"/>
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
     </div>
   </div>
 </template>
@@ -88,11 +109,12 @@ import ArtistSelectionElementUI from "../../components/common/artistSelection/Ar
 import {
   changeMusicStateToClosed,
   changeMusicStateToPublic,
-  changeMusicStateToWaited,
+  changeMusicStateToWaited, deleteMusic,
   getPageByMusicName
 } from "../../api/music.js";
 import {musicStatusColor} from '../../utils/musicSlotColorEnum.js';
 import {useQuasar} from "quasar";
+import {deletePlayList} from "../../api/play_list.js";
 
 const $q = useQuasar()
 
@@ -121,7 +143,8 @@ const allNum =ref(1);
 const sortNum =ref([ 3, 5, 7, 10, 15, 20, 25, 50 ]);
 
 const rowData =ref(null)
-
+const confirmDelete= ref (null)
+const rowId=ref(null)
 
 //子组件
 const RefChildren = ref(null)
@@ -248,6 +271,23 @@ const freeMusic =(id)=>{
     fetchData();
     $q.notify({message: '闲置成功', position: "top", type: 'positive',});
   })
+}
+
+const openConfirmDialog =(id)=>{
+  confirmDelete.value=true
+  rowId.value =id
+
+}
+
+const deleteMusicById =()=>{
+  if (rowId.value !== null) {
+    deleteMusic(rowId.value).then(res => {
+      console.log(res)
+      fetchData();
+      $q.notify({message: '删除成功', position: "top", type: 'positive',});
+    })
+  }
+  rowId.value=null;
 }
 
 </script>

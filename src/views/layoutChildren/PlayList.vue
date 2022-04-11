@@ -2,7 +2,7 @@
   <div class="page">
 
     <div class="q-mt-md q-mb-md">
-      <q-btn color="primary" label="添加歌手" @click="toggleDialog()"/>
+      <q-btn color="primary" label="添加歌单" @click="toggleDialog()"/>
     </div>
 
     <q-table
@@ -18,12 +18,23 @@
         :pagination-label="getPaginationLabel"
 
     >
+      <!--      ！！！！-->
+      <!--      想改特别标签的就在下面改下名字就行了-->
       <!--      <template v-slot:body-cell-你想使用插槽columns的名字="props">-->
 
-      <template v-slot:body-cell-artistState="props">
+      <template v-slot:body-cell-playListState="props">
         <q-td :props="props" key="id">
           <div>
             <q-badge outline :color="musicStatusColor[props.value]" :label="props.value" />
+          </div>
+        </q-td>
+      </template>
+
+
+      <template v-slot:body-cell-special="props">
+        <q-td :props="props" key="id">
+          <div>
+            <q-badge outline :color="props.value?'blue-10':'brown-10'" :label="props.value?'特色歌单':'普通歌单'" />
           </div>
         </q-td>
       </template>
@@ -44,27 +55,25 @@
         </q-td>
       </template>
 
-
-
       <template v-slot:body-cell-operation="props">
         <q-td :props="props">
           <div class="q-mt-md q-mb-md">
             <q-btn-dropdown color="primary" label="编辑"  @click="edit(props.row)" split>
 
               <q-list>
-                <q-item clickable v-close-popup v-if="props.row.artistState !== '已上架'" @click="publishArtist(props.row.id)">
+                <q-item clickable v-close-popup v-if="props.row.playListState !== '已上架'" @click="publishPlayList(props.row.id)">
                   <q-item-section>
                     <q-item-label>上架</q-item-label>
                   </q-item-section>
                 </q-item>
 
-                <q-item clickable v-close-popup  v-if="props.row.artistState !== '已下架'" @click="closedArtist(props.row.id)">
+                <q-item clickable v-close-popup  v-if="props.row.playListState !== '已下架'" @click="closedPlayList(props.row.id)">
                   <q-item-section>
                     <q-item-label>下架</q-item-label>
                   </q-item-section>
                 </q-item>
 
-                <q-item clickable v-close-popup  v-if="props.row.artistState !== '待上架'" @click="freeArtist(props.row.id)">
+                <q-item clickable v-close-popup  v-if="props.row.playListState !== '待上架'" @click="freePlayList(props.row.id)">
                   <q-item-section>
                     <q-item-label>闲置</q-item-label>
                   </q-item-section>
@@ -76,17 +85,12 @@
                   </q-item-section>
                 </q-item>
 
+
               </q-list>
             </q-btn-dropdown>
 
-
-
           </div>
-
-
-
         </q-td>
-
       </template>
 
 
@@ -101,7 +105,8 @@
           size="sm"
           @click="updateData"
       />
-      <CreateArtistDialog ref="RefChildren" @fetchData="fetchData" :rowData="rowData"></CreateArtistDialog>
+      <CreatePlayListDialog ref="RefChildren" @fetchData="fetchData" :rowData="rowData"></CreatePlayListDialog>
+
 
       <q-dialog v-model="confirmDelete" persistent>
         <q-card>
@@ -112,7 +117,7 @@
 
           <q-card-actions align="right">
             <q-btn flat label="取消" color="primary" v-close-popup />
-            <q-btn flat label="确定" color="primary" v-close-popup @click="deleteArtistById()"/>
+            <q-btn flat label="确定" color="primary" v-close-popup @click="deletePlayListById()"/>
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -126,7 +131,7 @@ import {computed, ref, onMounted, defineComponent} from "vue";
 import {getPageByUsername} from "../../api/user.js";
 import {nextTick,watch,watchEffect, toRefs} from 'vue'
 
-import CreateArtistDialog from "../../components/artist/CreateArtistDialog.vue";
+import CreatePlayListDialog from "../../components/play_list/CreatePlayListDialog.vue";
 import {
   changeMusicStateToClosed,
   changeMusicStateToPublic,
@@ -142,17 +147,25 @@ import {
   changeArtistStateToWaited, deleteArtist,
   getPageByArtistName
 } from "../../api/artist.js";
+import {
+  changePlayListStateToClosed,
+  changePlayListStateToPublic,
+  changePlayListStateToWaited, deletePlayList,
+  getPageByPlayListName
+} from "../../api/play_list.js";
 
 const $q = useQuasar()
 
 const columns = [
   {name:"id",label: 'Id', field: 'id', sortable: true, align: 'left'},
-  {name:"name",label: '歌手名', field: 'name', sortable: true, align: 'left'},
-  {name:"remake",label: '歌手简介', field: 'remark', sortable: true, align: 'left'},
+  {name:"name",label: '歌单名', field: 'name', sortable: true, align: 'left'},
+  {name:"description",label: '歌单描述', field: 'description', sortable: true, align: 'left'},
+  {name:"special",label: '是否为特色歌单', field: 'special', sortable: true, align: 'left'},
+
   {name:"recommended",label: '是否推荐', field: 'recommended', sortable: true, align: 'left'},
   {name:"recommendFactor",label: '推荐指数', field: 'recommendFactor', sortable: true, align: 'left'},
 
-  {name:"artistState",label: '歌手状态', field: 'artistState', sortable: true, align: 'left'},
+  {name:"playListState",label: '歌单状态', field: 'playListState', sortable: true, align: 'left'},
   {name:"operation",label: '操作', field: 'operation', align: 'left'},
 
 ]
@@ -172,12 +185,9 @@ const current =ref(1);
 const allNum =ref(1);
 const sortNum =ref([ 3, 5, 7, 10, 15, 20, 25, 50 ]);
 
-const rowId=ref(null)
-
-const confirmDelete=ref(null)
-
 const rowData =ref(null)
-
+const confirmDelete= ref (null)
+const rowId=ref(null)
 
 //子组件
 const RefChildren = ref(null)
@@ -226,18 +236,18 @@ const updateData = () => {
 
 
 // 多值监听
-    watch([pagination,current],([newPagination,newCurrent],[oldPagination,oldCurrent])=>{
-      console.log(newCurrent)
-      getPageByArtistName(newCurrent, newPagination.rowsPerPage, "").then(res => {
-        console.log(pagination.value.rowsPerPage)
-        console.log(res);
-        rows.value = res.data.records;
-        total.value = res.data.total;
-        sortNum.value=([ 3, 5, 7, 10, 15, 20, 25, 50,total.value]);
+watch([pagination,current],([newPagination,newCurrent],[oldPagination,oldCurrent])=>{
+  console.log(newCurrent)
+  getPageByPlayListName(newCurrent, newPagination.rowsPerPage, "").then(res => {
+    console.log(pagination.value.rowsPerPage)
+    console.log(res);
+    rows.value = res.data.records;
+    total.value = res.data.total;
+    sortNum.value=([ 3, 5, 7, 10, 15, 20, 25, 50,total.value]);
 
-        if (res.data.records === null){
-          current.value=1;
-        }
+    if (res.data.records === null){
+      current.value=1;
+    }
 
   })
 })
@@ -259,7 +269,7 @@ const getPaginationLabel =(firstRowIndex, endRowIndex, totalRowsNumber)=>{
 
 const fetchData = () => {
 
-  getPageByArtistName(current.value, pagination.value.rowsPerPage, "").then(res => {
+  getPageByPlayListName(current.value, pagination.value.rowsPerPage, "").then(res => {
     console.log(pagination.value.rowsPerPage)
     console.log(res);
     rows.value = res.data.records;
@@ -282,25 +292,24 @@ const edit =(row)=>{
 
 }
 
-const publishArtist=(id)=>{
-
-  changeArtistStateToPublic(id).then(res=>{
+const publishPlayList=(id)=>{
+  changePlayListStateToPublic(id).then(res=>{
     console.log(res)
     fetchData();
     $q.notify({message: '上架成功', position: "top", type: 'positive',});
   })
 }
 
-const closedArtist =(id)=>{
-  changeArtistStateToClosed(id).then(res=>{
+const closedPlayList =(id)=>{
+  changePlayListStateToClosed(id).then(res=>{
     console.log(res)
     fetchData();
     $q.notify({message: '下架成功', position: "top", type: 'positive',});
   })
 }
 
-const freeArtist =(id)=>{
-  changeArtistStateToWaited(id).then(res=>{
+const freePlayList =(id)=>{
+  changePlayListStateToWaited(id).then(res=>{
     console.log(res)
     fetchData();
     $q.notify({message: '闲置成功', position: "top", type: 'positive',});
@@ -314,9 +323,9 @@ const openConfirmDialog =(id)=>{
 
 }
 
-const deleteArtistById =()=>{
+const deletePlayListById =()=>{
   if (rowId.value !== null) {
-    deleteArtist(rowId.value).then(res => {
+    deletePlayList(rowId.value).then(res => {
       console.log(res)
       fetchData();
       $q.notify({message: '删除成功', position: "top", type: 'positive',});
@@ -324,7 +333,6 @@ const deleteArtistById =()=>{
   }
   rowId.value=null;
 }
-
 </script>
 
 

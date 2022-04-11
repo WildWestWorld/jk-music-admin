@@ -25,6 +25,11 @@ export const layoutChildren=[{
   name:"Artist",
   meta:{title:'歌手管理', icon:'mic'},
   component: ()=>import("../views/layoutChildren/Artist.vue"),
+},{
+  path: '/play_list',
+  name:"PlayList",
+  meta:{title:'歌单管理', icon:'shop_two'},
+  component: ()=>import("../views/layoutChildren/PlayList.vue"),
 },
 
   //children止

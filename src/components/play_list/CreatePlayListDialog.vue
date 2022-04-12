@@ -1,7 +1,10 @@
 <template>
 
   <q-dialog v-model="prompt" persistent>
+
+
     <q-card style="min-width: 350px">
+      <el-card shadow="always" style="width: 100%">
       <q-card-section>
         <div class="text-h6">新增歌单</div>
       </q-card-section>
@@ -46,7 +49,7 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <MusicSelectionElementUIV2 @MusicSelectionElementUI="inputSelectMusicList" :musicListFromFather="musicIdListFromFather"></MusicSelectionElementUIV2>
+        <MusicSelectionElementUIV2 @MusicSelectionElementUI="inputSelectMusicList" :MusicListFromFather="musicIdListFromFather"></MusicSelectionElementUIV2>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
@@ -57,14 +60,18 @@
         <q-btn label="确认" color="primary" v-close-popup @click="isEdit?editPlayList():createPlayList()"/>
         <q-btn flat label="取消" v-close-popup/>
       </q-card-actions>
+
+      </el-card >
     </q-card>
+
+
   </q-dialog>
 
 </template>
 
 <script setup>
 import {defineExpose} from 'vue'
-import {ref,defineProps} from "vue"
+import {ref,defineProps,nextTick} from "vue"
 
 import {useStore} from "vuex";
 import {useQuasar} from "quasar";
@@ -93,6 +100,8 @@ const id =ref(null)
 const recommendFactor=ref(null)
 const recommended=ref(null)
 const special=ref(false)
+const musicIdList= ref(null)
+
 
 const musicIdListFromChild=ref([]);
 const musicIdListFromFather=ref([]);
@@ -135,7 +144,7 @@ const uploadedGF = (res) => {
 
 const createPlayList = () => {
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
-  playList.value = {name: name.value, description: description.value, coverId:fileId.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
+  playList.value = {name: name.value, description: description.value, coverId:fileId.value,musicIdList:musicIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
 
 
 
@@ -151,7 +160,7 @@ const createPlayList = () => {
 }
 
 const editPlayList = ()=>{
-  playList.value = {id:id.value,name: name.value, description: description.value, coverId:fileId.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
+  playList.value = {id:id.value,name: name.value, description: description.value, coverId:fileId.value,musicIdList:musicIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
   if (playList.value.recommended === false){
     playList.value.recommendFactor =0;
   }
@@ -177,6 +186,9 @@ const togglePrompt = () => {
   recommendFactor.value=null;
   special.value=false;
 
+  musicIdListFromChild.value=null
+  musicIdListFromFather.value=null
+
   console.log(isEdit.value)
   //转换对话框的显示状态
   prompt.value = !prompt.value
@@ -201,11 +213,21 @@ const togglePromptEdit =()=>{
   fileEdit.value=null;
   id.value =null;
 
-  //转换对话框的显示状态
-  prompt.value = !prompt.value
+  musicIdListFromChild.value=null
+  musicIdListFromFather.value=null
+
+  nextTick(()=>{
+    //转换对话框的显示状态
+    prompt.value = !prompt.value
+
+  })
+
+
+
 
   name.value=props.rowData.name;
   description.value=props.rowData.description;
+
   if (props.rowData.photo !== null){
     file.value=props.rowData.cover;
     fileId.value=props.rowData.cover.id;
@@ -217,6 +239,11 @@ const togglePromptEdit =()=>{
   recommendFactor.value=props.rowData.recommendFactor
   recommended.value=props.rowData.recommended
   special.value=props.rowData.special
+
+  musicIdListFromChild.value=props.rowData.musicList.map(item=>item.id)
+  musicIdListFromFather.value=musicIdListFromChild.value
+
+
 
 }
 

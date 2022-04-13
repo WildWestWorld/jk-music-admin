@@ -28,7 +28,7 @@ export const layoutChildren=[{
 },{
   path: '/play_list',
   name:"PlayList",
-  meta:{title:'歌单管理', icon:'shop_two'},
+  meta:{title:'歌单管理', icon:'queue_music'},
   component: ()=>import("../views/layoutChildren/PlayList.vue"),
 },
 

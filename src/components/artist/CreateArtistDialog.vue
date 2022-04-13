@@ -79,7 +79,7 @@ const isEdit =ref(null)
 
 
 
-const label = ref('歌手封面上传');
+const label = ref('封面文件');
 
 const $q = useQuasar()
 

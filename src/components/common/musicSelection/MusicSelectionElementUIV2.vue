@@ -1,12 +1,12 @@
 <template>
   <div class="screening-config">
     <div class="title">选择音乐</div>
-    <el-select-v2 @change=showValue  	v-model="selectMusicList"     :options="MusicList"
+    <el-select-v2 @change=showValue  	 v-model="selectMusicList"     :options="MusicList"
                   filterable  multiple clearable
                   collapse-tags
                   popper-class="test"
                   :teleported="true"
-                  size="large" placeholder="请选择音乐"  style="min-width:100%;  width: 100% !important; " >
+                  size="large" placeholder="请选择音乐"  style=" width:100%;max-width: 320px; " >
 
 
       <template #default="{ item }" style="width: 100%;">
@@ -90,13 +90,10 @@ const showValue=()=>{
 
 </script>
 
-<style lang="scss">
+<style >
 
 
 
-.test {
-  width: 278px;
-}
 
 
 </style>

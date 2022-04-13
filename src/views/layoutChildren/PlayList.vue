@@ -282,7 +282,7 @@ const fetchData = () => {
 onMounted(fetchData);
 
 const edit =(row)=>{
-  console.log(current.value)
+  // console.log(current.value)
   rowData.value =row;
   console.log(rowData.value)
 

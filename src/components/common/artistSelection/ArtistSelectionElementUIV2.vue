@@ -1,9 +1,10 @@
 <template>
-  <el-card shadow="always" >
     <div class="title">选择歌手</div>
     <el-select-v2 @change=showValue v-model="selectArtistList"     :options="artistList"
                   filterable  multiple clearable
-                  size="large" placeholder="请选择歌手"  style="width:278px;" >
+                  popper-class="test"
+
+                  size="large" placeholder="请选择歌手"  style="width:100%;max-width: 320px;" >
 
 
       <template #default="{ item }">
@@ -12,7 +13,6 @@
       </template>
 
     </el-select-v2>
-  </el-card>
 
 </template>
 

@@ -1,0 +1,9 @@
+/*该文件是专门用于修改elementPlus的样式的*/
+.test {
+    width: 320px !important;
+}
+
+.test>div>div>div:first-child{
+    width: 100% !important;
+
+}

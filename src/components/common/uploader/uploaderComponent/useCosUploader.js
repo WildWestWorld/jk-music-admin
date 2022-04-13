@@ -14,7 +14,7 @@ export default createUploaderComponent({
     name: 'CosUploader', // your component's name
 
     props: {
-        // ...your custom props
+       label:{type:String}
     },
 
     emits: ['uploadedF'],
@@ -44,6 +44,8 @@ export default createUploaderComponent({
         };
 
         const upload = () => {
+
+
             console.log(helpers)
             //获取file对象
             filesArray.value = helpers.queuedFiles._rawValue
@@ -117,6 +119,8 @@ export default createUploaderComponent({
                             helpers.uploadedSize.value = helpers.uploadedSize.value+filesArray.value[0].size;
                             helpers.queuedFiles.value = [];
                             isUploading.value = false;
+
+                            res.data.label=props.label
 
                             emit("uploadedF",res.data)
 

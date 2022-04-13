@@ -4,6 +4,7 @@ import router from './router';
 import store from './store/index.js'
 import './permission'
 import ElementPlus from 'element-plus'
+import './assets/css/popcss.css'
 
 // Import icon libraries
 import '@quasar/extras/material-icons/material-icons.css';

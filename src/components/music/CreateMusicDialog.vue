@@ -1,7 +1,9 @@
 <template>
 
   <q-dialog v-model="prompt" persistent>
-    <q-card style="min-width: 350px">
+    <q-card style="min-width: 392px">
+      <el-card shadow="always" style="width: 100%">
+
       <q-card-section>
         <div class="text-h6">新增音乐</div>
       </q-card-section>
@@ -16,19 +18,28 @@
       </q-card-section>
 
 
+
+
       <q-card-section class="q-pt-none">
         <ArtistSelectionElementUIV2 @ArtistSelectionElementUI="inputSelectArtistList" :artistListFromFather="artistIdListFromFather"></ArtistSelectionElementUIV2>
       </q-card-section>
 
+        <q-card-section class="q-pt-none">
+          <Uploader :label="musicPhotoLabel" @uploadedGF="uploadedGF" :fileEdit="musicPhotoFileEdit"></Uploader>
+        </q-card-section>
+
+
       <q-card-section class="q-pt-none">
-        <Uploader :label="label" @uploadedGF="uploadedGF" :fileEdit="fileEdit"></Uploader>
+        <Uploader :label="musicLabel" @uploadedGF="uploadedGF" :fileEdit="fileEdit"></Uploader>
       </q-card-section>
+
 
 
       <q-card-actions align="right" class="text-primary">
         <q-btn label="确认" color="primary" v-close-popup @click="isEdit?editMusic():createMusic()"/>
         <q-btn flat label="取消" v-close-popup/>
       </q-card-actions>
+      </el-card>
     </q-card>
   </q-dialog>
 
@@ -57,9 +68,15 @@ const confirm = ref(false);
 const prompt = ref(false);
 const name = ref('');
 const description = ref('');
+
 const file = ref(null)
 const fileId =ref(null)
 const fileEdit =ref(null)
+
+const musicPhotoFile = ref(null)
+const musicPhotoFileId =ref(null)
+const musicPhotoFileEdit =ref(null)
+
 const id =ref(null)
 const music = ref(props.rowData||{name: '', description: '', file: null})
 const artistIdListFromChild=ref([]);
@@ -68,7 +85,8 @@ const isEdit =ref(null)
 
 
 
-const label = ref('音乐上传');
+const musicLabel = ref('音乐文件');
+const musicPhotoLabel = ref('封面文件');
 
 const $q = useQuasar()
 
@@ -93,18 +111,45 @@ const inputSelectArtistList=(artistIdList)=>{
 
 
 const uploadedGF = (res) => {
-  file.value = res;
-  if (file.value !==null){
-    fileId.value=file.value.id;
-    console.log(file.value)
+
+if (res !== null) {
+
+  if (res.label.toString().indexOf(musicPhotoLabel.value) !== -1) {
+
+    musicPhotoFile.value = res;
+    console.log(musicPhotoFile.value)
+    if (musicPhotoFile.value !== null) {
+      musicPhotoFileId.value = musicPhotoFile.value.id;
+      console.log(musicPhotoFile.value)
+
+    }
+
   }
+
+  if (res.label.toString().indexOf(musicLabel.value) !== -1) {
+
+    file.value = res;
+    if (file.value !== null) {
+      fileId.value = file.value.id;
+      console.log(file.value)
+    }
+
+  }
+
+
+}else {
+  musicPhotoFile.value=null
+  musicPhotoFileId.value=null
+}
+
 
 }
 
 
+
 const createMusic = () => {
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
-  music.value = {name: name.value, description: description.value, fileId:fileId.value,file: file.value,artistIdList:artistIdListFromChild.value};
+  music.value = {name: name.value, description: description.value, fileId:fileId.value,file: file.value,photoId:musicPhotoFileId.value,artistIdList:artistIdListFromChild.value};
 
 
 
@@ -120,7 +165,7 @@ const createMusic = () => {
 }
 
 const editMusic = ()=>{
-  music.value = {id:id.value,name: name.value, description: description.value, fileId:fileId.value,file: file.value,artistIdList:artistIdListFromChild.value};
+  music.value = {id:id.value,name: name.value, description: description.value, fileId:fileId.value,file: file.value,photoId:musicPhotoFileId.value,artistIdList:artistIdListFromChild.value};
 
   updateMusic(music.value.id,music.value).then(res=>{
     console.log(res)
@@ -139,11 +184,15 @@ const togglePrompt = () => {
   file.value=null;
   fileId.value=null;
   fileEdit.value=null;
+
+  musicPhotoFile.value=null;
+  musicPhotoFileId.value=null;
+  musicPhotoFileEdit.value=null;
+
   id.value =null;
   artistIdListFromChild.value=null;
   artistIdListFromFather.value=null;
 
-  console.log(isEdit.value)
   //转换对话框的显示状态
   prompt.value = !prompt.value
 
@@ -166,6 +215,11 @@ const togglePromptEdit =()=>{
   file.value=null;
   fileId.value=null;
   fileEdit.value=null;
+
+  musicPhotoFile.value=null;
+  musicPhotoFileId.value=null;
+  musicPhotoFileEdit.value=null;
+
   id.value =null;
   artistIdListFromChild.value=null
 
@@ -178,15 +232,20 @@ const togglePromptEdit =()=>{
   if (props.rowData.file !== null){
     file.value=props.rowData.file;
     fileId.value=props.rowData.file.id;
+    fileEdit.value=props.rowData.file
   }
 
-  fileEdit.value=props.rowData.file
+
+  if(props.rowData.photo !== null){
+    musicPhotoFile.value=props.rowData.photo;
+    musicPhotoFileId.value=props.rowData.photo.id;
+    musicPhotoFileEdit.value=props.rowData.photo
+  }
 
   id.value = props.rowData.id;
   artistIdListFromChild.value=props.rowData.artistVoList.map(item=>item.id)
   artistIdListFromFather.value=artistIdListFromChild.value
 
-  console.log(artistIdListFromChild.value)
 }
 
 

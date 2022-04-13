@@ -1,10 +1,9 @@
 <template>
 
   <q-dialog v-model="prompt" persistent>
-
-
-    <q-card style="min-width: 350px">
+    <q-card style="min-width: 392px">
       <el-card shadow="always" style="width: 100%">
+
       <q-card-section>
         <div class="text-h6">新增歌单</div>
       </q-card-section>
@@ -113,7 +112,7 @@ const isEdit =ref(null)
 
 
 
-const label = ref('歌单封面上传');
+const label = ref('封面文件');
 
 const $q = useQuasar()
 
@@ -133,6 +132,7 @@ const props = defineProps(
 
 
 const uploadedGF = (res) => {
+
   file.value = res;
   if (file.value !==null){
     fileId.value=file.value.id;

@@ -4,6 +4,7 @@
     <el-select-v2 @change=showValue  	 v-model="selectMusicList"     :options="MusicList"
                   filterable  multiple clearable
                   collapse-tags
+                  collapse-tags-tooltip
                   popper-class="test"
                   :teleported="true"
                   size="large" placeholder="请选择音乐"  style=" width:100%;max-width: 320px; " >

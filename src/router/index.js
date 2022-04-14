@@ -30,6 +30,11 @@ export const layoutChildren=[{
   name:"PlayList",
   meta:{title:'歌单管理', icon:'queue_music'},
   component: ()=>import("../views/layoutChildren/PlayList.vue"),
+},{
+  path: '/album',
+  name:"Album",
+  meta:{title:'专辑管理', icon:'library_music'},
+  component: ()=>import("../views/layoutChildren/Album.vue"),
 },
 
   //children止

@@ -67,7 +67,8 @@ const text=ref('测试')
 
 const reUpload =()=>{
   file.value=null;
-  emit('uploadedGF',null)
+  file.str=props.label
+  emit('uploadedGF',file.value)
 
 }
 

@@ -9,12 +9,12 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="name" label="歌单名字" autofocus lazy-rules
+        <q-input filled v-model="name" label="歌单名字" autofocus lazy-rules
                  :rules="[ val => val && val.length > 0 || '请输入歌单名字']"/>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="description" label="歌单描述" autofocus @keyup.enter="prompt = false"/>
+        <q-input filled v-model="description" label="歌单描述" autofocus @keyup.enter="prompt = false"/>
       </q-card-section>
 
       <q-card-section class="q-pt-none">

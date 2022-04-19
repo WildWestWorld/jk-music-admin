@@ -89,6 +89,13 @@
 
       </template>
 
+      <!--表格中的某个字段设置样式 cell后面的英文就是该字段-->
+      <template v-slot:header-cell-recommended="props" >
+        <q-th :props="props" >
+          <q-icon name="thumb_up" size="1.3em" color="red"/>
+          {{ props.col.label }}
+        </q-th>
+      </template>
 
 
     </q-table>

@@ -9,12 +9,13 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="name" label="音乐名" autofocus lazy-rules
+        <q-input  filled
+                 v-model="name" label="音乐名" autofocus lazy-rules
                  :rules="[ val => val && val.length > 0 || '请输入音乐名']"/>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="description" label="描述" autofocus @keyup.enter="prompt = false"/>
+        <q-input filled v-model="description" label="描述" autofocus @keyup.enter="prompt = false"/>
       </q-card-section>
 
 
@@ -112,15 +113,13 @@ const inputSelectArtistList=(artistIdList)=>{
 
 const uploadedGF = (res) => {
 
-if (res !== null) {
+if (res.label !== null) {
 
   if (res.label.toString().indexOf(musicPhotoLabel.value) !== -1) {
 
     musicPhotoFile.value = res;
-    console.log(musicPhotoFile.value)
     if (musicPhotoFile.value !== null) {
       musicPhotoFileId.value = musicPhotoFile.value.id;
-      console.log(musicPhotoFile.value)
 
     }
 
@@ -138,8 +137,14 @@ if (res !== null) {
 
 
 }else {
-  musicPhotoFile.value=null
-  musicPhotoFileId.value=null
+  if (res.str !== null) {
+    if (res.str.toString().indexOf(musicPhotoLabel.value) !== -1) {
+      musicPhotoFile.value = null
+      musicPhotoFileId.value = null
+    }else (res.str.toString().indexOf(musicLabel.value))
+    file.value =null
+    fileId.value=null
+  }
 }
 
 

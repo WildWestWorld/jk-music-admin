@@ -40,7 +40,12 @@
       <template v-slot:body-cell-playMusic="props">
         <q-td :props="props" key="id">
           <div>
-            <audio controls :src="props.row.file.url" v-if="props.row.file.url !==null"></audio>
+            <q-btn color="secondary" icon-right="play_circle_filled" :label="props.row.tagLabel" @click="playMusicAudio(props.row)" v-show="props.row.wantPlay!== true"/>
+
+
+
+
+            <audio controls :src="props.row.file.url" v-if="props.row.file.url !==null && props.row.wantPlay === true"></audio>
           </div>
         </q-td>
       </template>
@@ -83,7 +88,21 @@
         </q-td>
       </template>
 
+<!--    顶部搜索栏-->
+      <template v-slot:top-right>
+        <q-input borderless dense debounce="300" v-model="filter" placeholder="请输入关键字" @keyup.enter.native="searchDataByName">
+          <template v-slot:append>
+            <q-icon name="search" @click="searchDataByName"/>
+          </template>
+        </q-input>
+      </template>
 
+      <!--表格中的某个字段设置样式 cell后面的英文就是该字段-->
+      <template v-slot:header-cell-playMusic="props" >
+        <q-th :props="props" style="width: 350px;">
+          {{ props.col.label }}
+        </q-th>
+      </template>
 
     </q-table>
 
@@ -132,6 +151,8 @@ import {
 import {musicStatusColor} from '../../utils/musicSlotColorEnum.js';
 import {useQuasar} from "quasar";
 import {deletePlayList} from "../../api/play_list.js";
+import {searchFromGM} from "../../api/freeMusic.js";
+import axios from "axios";
 
 const $q = useQuasar()
 
@@ -164,6 +185,9 @@ const sortNum =ref([ 3, 5, 7, 10, 15, 20, 25, 50 ]);
 const rowData =ref(null)
 const confirmDelete= ref (null)
 const rowId=ref(null)
+
+const wantPlay=ref(false)
+const filter =ref(null)
 
 //子组件
 const RefChildren = ref(null)
@@ -214,18 +238,10 @@ const updateData = () => {
 // 多值监听
 watch([pagination,current],([newPagination,newCurrent],[oldPagination,oldCurrent])=>{
   console.log(newCurrent)
-  getPageByMusicName(newCurrent, newPagination.rowsPerPage, "").then(res => {
-    console.log(pagination.value.rowsPerPage)
-    console.log(res);
-    rows.value = res.data.records;
-    total.value = res.data.total;
-    sortNum.value=([ 3, 5, 7, 10, 15, 20, 25, 50,total.value]);
 
-    if (res.data.records === null){
-      current.value=1;
-    }
+  getPageByName(newCurrent,newPagination.rowsPerPage,"")
 
-  })
+
 })
 
 
@@ -242,18 +258,70 @@ const getPaginationLabel =(firstRowIndex, endRowIndex, totalRowsNumber)=>{
   return `TOTAL:${totalRowsNumber}`
 }
 
+const getPageByName =(pageNum,pageSize,SearchWord)=>{
+  // axios.post('test/search',{data:SearchWord,v:2}).then(res=>{
+  //   console.log(res)
+  // })
 
-const fetchData = () => {
-
-  getPageByMusicName(current.value, pagination.value.rowsPerPage, "").then(res => {
+  getPageByMusicName(pageNum, pageSize, SearchWord).then(res => {
     console.log(pagination.value.rowsPerPage)
     console.log(res);
+    res.data.records.map(item=>{item.tagLabel='音乐播放'})
     rows.value = res.data.records;
+
+
+    rows.value.map((item,index)=>{
+      let searchSwitch={song:1,album:0,singer:0,tagSong:0,mvSong:0,songlist:0,bestShow:1}
+      let searchWord = item.name+'-'+item.artistVoList[0].name
+      // let searchWord = item.name+'-'+item.artistVoList[0].name
+
+
+      searchFromGM('Android_migu','5.0.1',searchWord,current.value,pagination.value.rowsPerPage,searchSwitch).then(res=> {
+        console.log( res.data.songResultData.result)
+
+        console.log(item.name)
+        res.data.songResultData.result=res.data.songResultData.result.filter(music=>music.name.indexOf(item.name) !== -1)
+        console.log( res.data.songResultData.result)
+        if ( res.data.songResultData.result[0]) {
+
+          console.log(res.data.songResultData.result[0])
+          let ourArtist = item.artistVoList[0].name
+          console.log(ourArtist)
+          let MGArtist = res.data.songResultData.result[0].singers.map(item => item.name).includes(ourArtist)
+
+
+          if (res.data.songResultData.result != null && (MGArtist === true)  ) {
+            item.file.url = res.data.songResultData.result[0].rateFormats[0].url.replace('ftp://218.200.160.122:21', 'https://freetyst.nf.migu.cn')
+            item.tagLabel='√音乐播放'
+
+          }
+
+
+        }
+
+      })
+
+    })
+
     total.value = res.data.total;
     // pagination.value.rowsNumber=total.value;
+
+    sortNum.value=([ 3, 5, 7, 10, 15, 20, 25, 50,total.value]);
+
+    if (res.data.records === null){
+      current.value=1;
+    }
+
   })
 }
 
+const fetchData = () => {
+  getPageByName(current.value,pagination.value.rowsPerPage,"")
+}
+
+const searchDataByName =()=>{
+  getPageByName(current.value,pagination.value.rowsPerPage,filter.value)
+}
 
 onMounted(fetchData);
 
@@ -308,6 +376,42 @@ const deleteMusicById =()=>{
   }
   rowId.value=null;
 }
+
+const playMusicAudio =(row)=>{
+  row.wantPlay = true
+  //  let searchSwitch={song:1,album:0,singer:0,tagSong:0,mvSong:0,songlist:0,bestShow:1}
+  //   let searchWord = row.name+''+row.artistVoList[0].name
+  //     console.log(searchWord)
+  // searchFromGM('Android_migu','5.0.1',searchWord,current.value,pagination.value.rowsPerPage,searchSwitch).then(res=> {
+  //
+  //   if ( res.data.songResultData.result[0]) {
+  //
+  //   console.log(res)
+  //   let ourArtist = row.artistVoList[0].name
+  //   console.log(ourArtist)
+  //   let MGArtist = res.data.songResultData.result[0].singers.map(item => item.name).includes(ourArtist)
+  //
+  //   console.log(MGArtist)
+  //   if (res.data.songResultData.result != null && (MGArtist === true)) {
+  //     row.file.url = res.data.songResultData.result[0].rateFormats[0].url.replace('ftp://218.200.160.122:21', 'https://freetyst.nf.migu.cn')
+  //     row.wantPlay = true
+  //     row.MGRes=res.data;
+  //   }else {
+  //     //有歌但不是一个作者的歌
+  //     row.wantPlay = true
+  //   }
+  //
+  //
+  // }else {
+  //     //GM没有的歌
+  //     row.wantPlay = true
+  //   }
+  //
+  // })
+
+
+}
+
 
 </script>
 

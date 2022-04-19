@@ -35,6 +35,11 @@ export const layoutChildren=[{
   name:"Album",
   meta:{title:'专辑管理', icon:'library_music'},
   component: ()=>import("../views/layoutChildren/Album.vue"),
+},{
+  path: '/freeMusic',
+  name:"freeMusic",
+  meta:{title:'乐库管理', icon:'audio_file'},
+  component: ()=>import("../views/layoutChildren/FreeMusic.vue"),
 },
 
   //children止

@@ -1,6 +1,6 @@
 import request from "./request.js";
 
-export const getMusicList =(searchWord)=>{
+export const getAlbumList =(searchWord)=>{
     return request.get("/album",{params:{searchWord}})
 }
 

@@ -7,12 +7,12 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="name" label="歌手名字" autofocus lazy-rules
+        <q-input filled v-model="name" label="歌手名字" autofocus lazy-rules
                  :rules="[ val => val && val.length > 0 || '请输入歌手名字']"/>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="remark" label="歌手描述" autofocus @keyup.enter="prompt = false"/>
+        <q-input filled v-model="remark" label="歌手描述" autofocus @keyup.enter="prompt = false"/>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
@@ -28,6 +28,15 @@
 
       <q-card-section class="q-pt-none">
         <q-input v-show="recommended" dense v-model="recommendFactor" label="推荐指数" autofocus @keyup.enter="prompt = false"/>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none">
+        <MusicSelectionElementUIV2 @MusicSelectionElementUI="inputSelectMusicList" :MusicListFromFather="musicIdListFromFather"></MusicSelectionElementUIV2>
+      </q-card-section>
+
+
+      <q-card-section class="q-pt-none">
+        <AlbumSelectionElementUIV2 @AlbumSelectionElementUI="inputSelectAlbumList" :AlbumListFromFather="albumIdListFromFather"></AlbumSelectionElementUIV2>
       </q-card-section>
 
 
@@ -52,6 +61,10 @@ import {useStore} from "vuex";
 import {useQuasar} from "quasar";
 import {createUserRequest} from "../../api/user.js";
 import {createMusicRequest, updateMusic} from "../../api/music.js";
+import MusicSelectionElementUIV2 from "../common/musicSelection/MusicSelectionElementUIV2.vue"
+import AlbumSelectionElementUIV2 from "../common/albumSelection/AlbumSelectionElementUIV2.vue"
+
+
 
 import Uploader from "../common/uploader/Uploader.vue"
 import CosUploader from "../common/uploader/uploaderComponent/useCosUploader.js";
@@ -71,7 +84,11 @@ const id =ref(null)
 const recommendFactor=ref(null)
 const recommended=ref(null)
 
+const musicIdListFromChild=ref([]);
+const musicIdListFromFather=ref([]);
 
+const albumIdListFromChild=ref([]);
+const albumIdListFromFather=ref([]);
 
 const artist = ref(props.rowData||{name: '', remark: '', file: null})
 
@@ -110,7 +127,7 @@ const uploadedGF = (res) => {
 
 const createArtist = () => {
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
-  artist.value = {name: name.value, remark: remark.value, photoId:fileId.value,photo: file.value,recommendFactor:recommendFactor.value,recommended:recommended.value};
+  artist.value = {name: name.value, remark: remark.value, photoId:fileId.value,photo: file.value,musicIdList:musicIdListFromChild.value,albumIdList:albumIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value};
 
 
 
@@ -126,7 +143,7 @@ const createArtist = () => {
 }
 
 const editArtist = ()=>{
-  artist.value = {id:id.value,name: name.value, remark: remark.value, photoId:fileId.value,file: file.value,recommendFactor:recommendFactor.value,recommended:recommended.value};
+  artist.value = {id:id.value,name: name.value, remark: remark.value, photoId:fileId.value,file: file.value,musicIdList:musicIdListFromChild.value,albumIdList:albumIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value};
 
   if (artist.value.recommended === false){
     artist.value.recommendFactor =0;
@@ -152,6 +169,13 @@ const togglePrompt = () => {
   id.value =null;
   recommended.value=false;
   recommendFactor.value=null;
+
+  musicIdListFromChild.value=null
+  musicIdListFromFather.value=null
+
+   albumIdListFromChild.value=null;
+   albumIdListFromFather.value=null;
+
   console.log(isEdit.value)
   //转换对话框的显示状态
   prompt.value = !prompt.value
@@ -177,6 +201,13 @@ const togglePromptEdit =()=>{
   fileEdit.value=null;
   id.value =null;
 
+  musicIdListFromChild.value=null
+  musicIdListFromFather.value=null
+
+  albumIdListFromChild.value=null;
+  albumIdListFromFather.value=null;
+
+
   //转换对话框的显示状态
   prompt.value = !prompt.value
 
@@ -193,9 +224,24 @@ const togglePromptEdit =()=>{
   recommendFactor.value=props.rowData.recommendFactor
   recommended.value=props.rowData.recommended
 
+
+  musicIdListFromChild.value=props.rowData.musicVoList.map(item=>item.id)
+  musicIdListFromFather.value=musicIdListFromChild.value
+
+  albumIdListFromChild.value=props.rowData.albumVoList.map(item=>item.id);
+  albumIdListFromFather.value=albumIdListFromChild.value;
+
 }
 
+const inputSelectMusicList=(musicIdList)=>{
+  musicIdListFromChild.value=musicIdList
+  console.log(musicIdListFromChild.value)
+}
 
+const inputSelectAlbumList=(albumIdList)=>{
+  albumIdListFromChild.value=albumIdList
+  console.log(albumIdListFromChild.value)
+}
 
 //暴露函数给父组件
 defineExpose({

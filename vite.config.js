@@ -28,6 +28,21 @@ export default defineConfig({
         changeOrigin: true,              //是否设置同源，输入是的
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
+      '/gm': {              //设置拦截器  拦截器格式   斜杠+拦截器名字，名字可以自己定
+        target: 'http://pd.musicapp.migu.cn',     //代理的目标地址
+        changeOrigin: true,              //是否设置同源，输入是的
+        rewrite: (path) => path.replace(/^\/gm/, ''),
+      },
+      '/musicFile': {              //设置拦截器  拦截器格式   斜杠+拦截器名字，名字可以自己定
+        target: '  https://freetyst.nf.migu.cn',     //代理的目标地址
+        changeOrigin: true,              //是否设置同源，输入是的
+        rewrite: (path) => path.replace(/^\/musicFile/, ''),
+      },
+      '/test': {              //设置拦截器  拦截器格式   斜杠+拦截器名字，名字可以自己定
+        target: ' http://59.110.45.28/m/api',     //代理的目标地址
+        changeOrigin: true,              //是否设置同源，输入是的
+        rewrite: (path) => path.replace(/^\/test/, ''),
+      },
 
     }
   }

@@ -57,6 +57,13 @@
             <q-btn-dropdown color="primary" label="编辑"  @click="edit(props.row)" split>
 
             <q-list>
+
+              <q-item clickable v-close-popup v-if="props.row.musicLabel !== '√音乐播放'" @click="downLoadMusicFilePQ(props.row)">
+                <q-item-section>
+                  <q-item-label>下载歌曲</q-item-label>
+                </q-item-section>
+              </q-item>
+
               <q-item clickable v-close-popup v-if="props.row.musicState !== '已上架'" @click="publishMusic(props.row.id)">
                 <q-item-section>
                   <q-item-label>上架</q-item-label>
@@ -151,8 +158,9 @@ import {
 import {musicStatusColor} from '../../utils/musicSlotColorEnum.js';
 import {useQuasar} from "quasar";
 import {deletePlayList} from "../../api/play_list.js";
-import {searchFromGM} from "../../api/freeMusic.js";
+import {freeMusicFromFreeMp3, searchFromGM} from "../../api/freeMusic.js";
 import axios from "axios";
+import {encode} from "../../utils/encodeObsfuscator.js";
 
 const $q = useQuasar()
 
@@ -263,6 +271,28 @@ const getPageByName =(pageNum,pageSize,SearchWord)=>{
   //   console.log(res)
   // })
 
+
+  // filter.value='仙剑奇侠传'
+  // if (filter.value !== null){
+  //
+  //
+  //   let data =encode('text='+filter.value+'&page='+current.value+'&type=migu').slice(5,-1)
+  //   let v =2
+  //   console.log(data)
+  //
+  //   let params = new URLSearchParams();
+  //   params.append("data",data)
+  //   params.append("v",v)
+  //
+  //   freeMusicFromFreeMp3(params).then(res=>{
+  //     console.log(res)
+  //   })
+  //
+  // }
+  //
+
+
+
   getPageByMusicName(pageNum, pageSize, SearchWord).then(res => {
     console.log(pagination.value.rowsPerPage)
     console.log(res);
@@ -271,27 +301,49 @@ const getPageByName =(pageNum,pageSize,SearchWord)=>{
 
 
     rows.value.map((item,index)=>{
-      let searchSwitch={song:1,album:0,singer:0,tagSong:0,mvSong:0,songlist:0,bestShow:1}
+      // let searchSwitch={song:1,album:0,singer:0,tagSong:0,mvSong:0,songlist:0,bestShow:1}
       let searchWord = item.name+'-'+item.artistVoList[0].name
       // let searchWord = item.name+'-'+item.artistVoList[0].name
 
+        let data =encode('text='+searchWord+'&page=1'+'&type=migu')
+      // console.log(data)
+         data =data.split("&")[0].split("=")[1]
+        let v =2
+        // console.log(data)
 
-      searchFromGM('Android_migu','5.0.1',searchWord,current.value,pagination.value.rowsPerPage,searchSwitch).then(res=> {
-        console.log( res.data.songResultData.result)
+        let params = new URLSearchParams();
+        params.append("data",data)
+        params.append("v",v)
 
-        console.log(item.name)
-        res.data.songResultData.result=res.data.songResultData.result.filter(music=>music.name.indexOf(item.name) !== -1)
-        console.log( res.data.songResultData.result)
-        if ( res.data.songResultData.result[0]) {
+        freeMusicFromFreeMp3(params).then(res=> {
+        // console.log( res.data)
+        // console.log(res.data.data.list)
+        // console.log(item.name)
+        // res.data.data.list=res.data.data.list.filter(music=>music.name.indexOf(item.name) !== -1)
+          let dataList =res.data.data.list
+          res.data.data.list=res.data.data.list.filter(music=>music.name===(item.name))
 
-          console.log(res.data.songResultData.result[0])
+          if (res.data.data.list.length === 0) {
+            console.log(item.name,item.name,item.name)
+            res.data.data.list = dataList.filter(music => music.name.indexOf(item.name) !== -1)
+
+            if (res.data.data.list.length !== 0) {
+              console.log(res.data.data.list[0].name)
+            }
+          }
+          console.log( res.data.data)
+        if ( res.data.data.list[0]) {
+
+          // console.log(res.data.data.list[0])
           let ourArtist = item.artistVoList[0].name
-          console.log(ourArtist)
-          let MGArtist = res.data.songResultData.result[0].singers.map(item => item.name).includes(ourArtist)
+          // console.log(ourArtist)
+          let MGArtist =res.data.data.list.filter(list=>list.artist.includes(ourArtist))
+          console.log(MGArtist)
 
 
-          if (res.data.songResultData.result != null && (MGArtist === true)  ) {
-            item.file.url = res.data.songResultData.result[0].rateFormats[0].url.replace('ftp://218.200.160.122:21', 'https://freetyst.nf.migu.cn')
+
+          if (res.data.data.list != null && (MGArtist[0]!== undefined)  ) {
+            item.file.url = res.data.data.list[0].url
             item.tagLabel='√音乐播放'
 
           }
@@ -411,6 +463,46 @@ const playMusicAudio =(row)=>{
 
 
 }
+
+
+const downLoadMusicFilePQ=(row)=>{
+  window.open(row.file.url.replace("http://218.205.239.34","/encodeMusicFile"),'blank')
+
+  //
+  // const config = {
+  //   baseURL: row.file.url,
+  //
+  //
+  // };
+
+  // console.log(axios.getUri(config))
+
+  // console.log(row.file.url)
+  // window.open(row.rateFormats[0].url.replace('ftp://218.200.160.122:21','https://freetyst.nf.migu.cn'),'blank')
+  // axios.get(row.file.url.replace("http://218.205.239.34","/encodeMusicFile"),{ responseType: 'blob',redirect:'follow',headers: { 'Content-Type': 'application/x-www-form-urlencoded'} }).then(res=>{
+  //
+  //   console.log(res)
+  //   //content就是你下载的内容
+  //   let content=res.data
+  //
+  //   //创建一个a标签
+  //   let a = document.createElement('a');
+  //   //创建一个用于下载的url 记得要是blob类型不然没法正常下载 注意这个content就是我们要下载的文件内容
+  //   let url = window.URL.createObjectURL(new Blob([content],
+  //       { type:"charset=" + ( 'utf-8') }));
+  //   //将a标签的href设置为url
+  //   a.href = url;
+  //   //将a标签的download属性设置为我们想要的文件名即可
+  //   a.download =  row.name+'-'+row.artistVoList.map(item=>item.name).join('/')+'.'+'mp3';
+  //   //然后我们设置一个a标签的click事件，这样就会开始下载了
+  //   a.click();
+  //   //销毁我们前面设置的a标签
+  //   window.URL.revokeObjectURL(url);
+  //
+  // })
+
+}
+
 
 
 </script>

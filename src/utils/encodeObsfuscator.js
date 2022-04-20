@@ -1,4 +1,7 @@
 
+import CryptoJS from 'crypto-js';
+
+
 
 let _0xodO = 'jsjiami.com.v6'
 
@@ -342,12 +345,16 @@ let _0x5e84 = function(_0x1b1352, _0x5a683a) {
 
 };
 
-var CryJS = require("D:\\Project\\jk-music-admin\\node_modules\\crypto-js")
+// 若是要只运行这个js文件就把下面的代码注释掉
+// let CryJS = require("D:\\Project\\jk-music-admin\\node_modules\\crypto-js")
 var md5 =function (a){
-    return  CryJS.MD5(a).toString()
+    return CryptoJS.MD5(a).toString()
 }
 
-function encode(_0xa6f0d) {
+export function encode(_0xa6f0d) {
+
+
+
 
     var key =encodeURI(_0xa6f0d.split("=")[1].split("&")[0])
     var location={
@@ -926,4 +933,4 @@ function encode(_0xa6f0d) {
     return _0x514ed7[_0x5e84('1cc', 'DUN)')](_0x514ed7[_0x5e84('1cd', '&v[D')](_0x514ed7[_0x5e84('1ce', 'q6%w')], _0x3831d9), _0x514ed7[_0x5e84('1cf', 'hvef')]);
 }
 
-console.log(encode("text=周杰伦&page=1&type=migu"));
+// console.log(encode("text=周杰伦&page=1&type=migu"));

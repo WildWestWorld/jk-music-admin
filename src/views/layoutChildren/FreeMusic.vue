@@ -181,8 +181,9 @@ import {
 import {musicStatusColor} from '../../utils/musicSlotColorEnum.js';
 import {useQuasar} from "quasar";
 import {deletePlayList} from "../../api/play_list.js";
-import {searchFromGM, testFreeMusic} from "../../api/freeMusic.js";
+import {freeMusicFromFreeMp3, searchFromGM} from "../../api/freeMusic.js";
 import axios from "axios";
+import {encode} from "../../utils/encodeObsfuscator.js";
 
 const $q = useQuasar()
 
@@ -314,16 +315,11 @@ const getPaginationLabel =(firstRowIndex, endRowIndex, totalRowsNumber)=>{
 
 
 const fetchDataFromGM = () => {
-  let data = "de983joqHq3Uxki7W0rNa3sBmlR8djLrrR8Ohvs7pLZHdSgWSeIbP22F52NccWnLhzTPQsHZ-X5FGzEP";
-  let v =2
-  let params = new URLSearchParams();
 
-  params.append("data",data)
-  params.append("v",v)
 
-  testFreeMusic(params).then(res=>{
-    console.log(res)
-  })
+
+
+
 
 
 
@@ -527,20 +523,113 @@ const downLoadMusicFileWS=(row)=>{
 
 const downLoadMusicImgSmall=(row)=>{
 
-  window.open(row.imgItems[2].img,'blank')
+  var image = new Image()
+
+  // 解决跨域 Canvas 污染问题
+  image.setAttribute('crossOrigin', 'anonymous');
+  let type= 'png'
+  let name =row.name+'-'+row.singers.map(item=>item.name).join('/')+'(小)'
+  image.src = row.imgItems[2].img;
+  image.onload = function () {
+    // 创建一个canvas标签
+    var canvas = document.createElement('canvas')
+    // 设置canvas的宽高
+
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    var context = canvas.getContext('2d')
+    context.drawImage(image, 0, 0);
+
+    // 把canvas的内容转化为base64格式
+    var imageType = type === "png" ? "image/png" : "image/jpeg";
+    var base64url = canvas.toDataURL(imageType)
+
+    // 生成一个a元素
+    var a = document.createElement('a');
+    a.download = name || '文件下载'
+    a.href = base64url
+    // 创建一个单击事件
+    var event = new MouseEvent('click');
+
+    // 触发a的单击事件
+    a.dispatchEvent(event)
+  }
+  // window.open(row.imgItems[2].img,'blank')
 
 
 }
 const downLoadMusicImgMiddle=(row)=>{
 
-  window.open(row.imgItems[1].img,'blank')
+  var image = new Image()
+
+  // 解决跨域 Canvas 污染问题
+  image.setAttribute('crossOrigin', 'anonymous');
+  let type= 'png'
+  let name =row.name+'-'+row.singers.map(item=>item.name).join('/')+'(中)'
+  image.src = row.imgItems[1].img;
+  image.onload = function () {
+    // 创建一个canvas标签
+    var canvas = document.createElement('canvas')
+    // 设置canvas的宽高
+
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    var context = canvas.getContext('2d')
+    context.drawImage(image, 0, 0);
+
+    // 把canvas的内容转化为base64格式
+    var imageType = type === "png" ? "image/png" : "image/jpeg";
+    var base64url = canvas.toDataURL(imageType)
+
+    // 生成一个a元素
+    var a = document.createElement('a');
+    a.download = name || '文件下载'
+    a.href = base64url
+    // 创建一个单击事件
+    var event = new MouseEvent('click');
+
+    // 触发a的单击事件
+    a.dispatchEvent(event)
+  }
+  // window.open(row.imgItems[1].img,'blank')
 
 
 }
 
 const downLoadMusicImgBig=(row)=>{
+  var image = new Image()
 
-  window.open(row.imgItems[0].img,'blank')
+  // 解决跨域 Canvas 污染问题
+  image.setAttribute('crossOrigin', 'anonymous');
+  let type= 'png'
+  let name =row.name+'-'+row.singers.map(item=>item.name).join('/')+'(大)'
+  image.src = row.imgItems[1].img;
+  image.onload = function () {
+    // 创建一个canvas标签
+    var canvas = document.createElement('canvas')
+    // 设置canvas的宽高
+
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    var context = canvas.getContext('2d')
+    context.drawImage(image, 0, 0);
+
+    // 把canvas的内容转化为base64格式
+    var imageType = type === "png" ? "image/png" : "image/jpeg";
+    var base64url = canvas.toDataURL(imageType)
+
+    // 生成一个a元素
+    var a = document.createElement('a');
+    a.download = name || '文件下载'
+    a.href = base64url
+    // 创建一个单击事件
+    var event = new MouseEvent('click');
+
+    // 触发a的单击事件
+    a.dispatchEvent(event)
+  }
+
+  // window.open(row.imgItems[0].img,'blank')
 
 
 }

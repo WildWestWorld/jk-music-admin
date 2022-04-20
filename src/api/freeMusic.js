@@ -17,7 +17,7 @@ export const searchFromGM =(ua,version,text,pageNo,pageSize,searchSwitch)=>{
 
 }
 
-export const testFreeMusic =(data)=>{
+export const freeMusicFromFreeMp3 =(data)=>{
     let config = {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'

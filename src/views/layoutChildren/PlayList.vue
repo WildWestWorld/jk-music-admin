@@ -30,6 +30,13 @@
         </q-td>
       </template>
 
+      <template v-slot:body-cell-tag="props">
+        <q-td :props="props" key="id">
+          <div>
+            <q-badge outline :color="props.row.tagList.length !== 0?'pink':'brown'" :label="props.row.tagList.length !== 0 ? props.row.tagList.map(item=>item.name).join('/'):'暂未设置标签' " />
+          </div>
+        </q-td>
+      </template>
 
       <template v-slot:body-cell-special="props">
         <q-td :props="props" key="id">
@@ -166,6 +173,7 @@ const columns = [
   {name:"id",label: 'Id', field: 'id', sortable: true, align: 'left'},
   {name:"name",label: '歌单名', field: 'name', sortable: true, align: 'left'},
   {name:"description",label: '歌单描述', field: 'description', sortable: true, align: 'left'},
+  {name:"tag",label: '标签', field: 'tag',  align: 'left'},
   {name:"special",label: '是否为特色歌单', field: 'special', sortable: true, align: 'left'},
 
   {name:"recommended",label: '是否推荐', field: 'recommended', sortable: true, align: 'left'},

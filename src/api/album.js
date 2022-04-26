@@ -4,6 +4,10 @@ export const getAlbumList =(searchWord)=>{
     return request.get("/album",{params:{searchWord}})
 }
 
+export const getAlbumSelectionList =(searchWord)=>{
+    return request.get("/album/selection",{params:{searchWord}})
+}
+
 export const getPageByAlbumName=( pageNum,pageSize,searchWord)=>{
     return request.get("/album/page",{params:{ pageNum,pageSize,searchWord}})
 }

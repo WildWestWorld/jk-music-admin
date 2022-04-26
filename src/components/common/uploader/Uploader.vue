@@ -16,7 +16,7 @@
 
         </template>
         <template v-slot:control>
-          <div class="self-center full-width no-outline" tabindex="0">{{file.name.toString().slice(0,24)+'.'+file.ext}}</div>
+          <div class="self-center full-width no-outline" tabindex="0">{{file.name.search( /[^u4e00-u9fa5]/) !== -1?file.name.slice(0,15)+'.'+file.ext:file.name.slice(0,24)+'.'+file.ext}}</div>
         </template>
         <template v-slot:append>
           <q-icon name="close" class="cursor-pointer"  @click="reUpload"/>

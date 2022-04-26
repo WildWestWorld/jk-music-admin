@@ -2,9 +2,8 @@
   <div class="page">
 
     <div class="q-mt-md q-mb-md">
-      <q-btn color="primary" label="添加音乐" @click="toggleDialog()"/>
+      <q-btn color="primary" label="添加角色" @click="toggleDialog()"/>
     </div>
-
 
     <q-table
         title="Treats"
@@ -19,7 +18,7 @@
         :pagination-label="getPaginationLabel"
 
     >
-<!--      <template v-slot:body-cell-你想使用插槽columns的名字="props">-->
+      <!--      <template v-slot:body-cell-你想使用插槽columns的名字="props">-->
 
       <template v-slot:body-cell-name="props">
         <q-td :props="props" key="id">
@@ -37,22 +36,6 @@
         </q-td>
       </template>
 
-      <template v-slot:body-cell-artist="props">
-        <q-td :props="props" key="id">
-          <div>
-            <q-badge outline :color="props.row.artistVoList.length !== 0?'black':'grey'" :label="props.row.artistVoList.length !== 0 ? props.row.artistVoList.map(item=>item.name).join('/'):'暂未选定歌手' " />
-          </div>
-        </q-td>
-      </template>
-
-
-      <template v-slot:body-cell-tag="props">
-        <q-td :props="props" key="id">
-          <div>
-            <q-badge outline :color="props.row.tagList.length !== 0?'pink':'brown'" :label="props.row.tagList.length !== 0 ? props.row.tagList.map(item=>item.name).join('/'):'暂未设置标签' " />
-          </div>
-        </q-td>
-      </template>
 
       <template v-slot:body-cell-musicState="props">
         <q-td :props="props" key="id">
@@ -79,62 +62,37 @@
       <template v-slot:body-cell-operation="props">
         <q-td :props="props">
           <div class="q-mt-md q-mb-md">
-            <q-btn-dropdown color="primary" label="编辑音乐"  @click="edit(props.row)" split>
-
-            <q-list>
-
-<!--              <q-item clickable v-close-popup v-if="props.row.musicLabel !== '√音乐播放'" @click="downLoadMusicFilePQ(props.row)">-->
-<!--                <q-item-section>-->
-<!--                  <q-item-label>下载歌曲</q-item-label>-->
-<!--                </q-item-section>-->
-<!--              </q-item>-->
-
-              <q-item clickable v-close-popup v-if="props.row.musicState !== '已上架'" @click="publishMusic(props.row.id)">
-                <q-item-section>
-                  <q-item-label>上架音乐</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item clickable v-close-popup  v-if="props.row.musicState !== '已下架'" @click="closedMusic(props.row.id)">
-                <q-item-section>
-                  <q-item-label>下架音乐</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item clickable v-close-popup  v-if="props.row.musicState !== '待上架'" @click="freeMusic(props.row.id)">
-                <q-item-section>
-                  <q-item-label>闲置音乐</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item clickable v-close-popup  @click="openConfirmDialog(props.row.id)">
-                <q-item-section>
-                  <q-item-label>删除音乐</q-item-label>
-                </q-item-section>
-              </q-item>
-
-            </q-list>
-            </q-btn-dropdown>
-<!--    用于下载音乐的按钮-->
-            <q-btn-dropdown color="deep-purple-7" label="下载音乐"  @click="downLoadMusicFilePQ(props.row)(props.row)" split style="margin-left: 30px"   v-if="props.row.musicLabel !== '√音乐播放'">
+            <q-btn-dropdown color="primary" label="编辑"  @click="edit(props.row)" split>
 
               <q-list>
 
-                   <q-item clickable v-close-popup v-if="props.row.mgMusic" @click="downLoadMusicFilePQ(props.row)">
-                         <q-item-section>
-                         <q-item-label>下载音乐文件</q-item-label>
-                    </q-item-section>
-                  </q-item>
+                <!--              <q-item clickable v-close-popup v-if="props.row.musicLabel !== '√音乐播放'" @click="downLoadMusicFilePQ(props.row)">-->
+                <!--                <q-item-section>-->
+                <!--                  <q-item-label>下载歌曲</q-item-label>-->
+                <!--                </q-item-section>-->
+                <!--              </q-item>-->
 
-                <q-item clickable v-close-popup v-if="props.row.mgMusic" @click="downLoadMusicImg(props.row)" >
-                  <q-item-section>
-                    <q-item-label>下载音乐封面</q-item-label>
-                  </q-item-section>
-                </q-item>
+                <!--                <q-item clickable v-close-popup v-if="props.row.musicState !== '已上架'" @click="publishMusic(props.row.id)">-->
+                <!--                  <q-item-section>-->
+                <!--                    <q-item-label>上架音乐</q-item-label>-->
+                <!--                  </q-item-section>-->
+                <!--                </q-item>-->
 
-                <q-item clickable v-close-popup v-if="props.row.mgMusic" @click="downLoadMusicLyc(props.row)">
+                <!--                <q-item clickable v-close-popup  v-if="props.row.musicState !== '已下架'" @click="closedMusic(props.row.id)">-->
+                <!--                  <q-item-section>-->
+                <!--                    <q-item-label>下架音乐</q-item-label>-->
+                <!--                  </q-item-section>-->
+                <!--                </q-item>-->
+
+                <!--                <q-item clickable v-close-popup  v-if="props.row.musicState !== '待上架'" @click="freeMusic(props.row.id)">-->
+                <!--                  <q-item-section>-->
+                <!--                    <q-item-label>闲置音乐</q-item-label>-->
+                <!--                  </q-item-section>-->
+                <!--                </q-item>-->
+
+                <q-item clickable v-close-popup  @click="openConfirmDialog(props.row.id)">
                   <q-item-section>
-                    <q-item-label>下载音乐歌词</q-item-label>
+                    <q-item-label>删除</q-item-label>
                   </q-item-section>
                 </q-item>
 
@@ -150,7 +108,7 @@
         </q-td>
       </template>
 
-<!--    顶部搜索栏-->
+      <!--    顶部搜索栏-->
       <template v-slot:top-right>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="请输入关键字" @keyup.enter.native="searchDataByName">
           <template v-slot:append>
@@ -176,7 +134,7 @@
           size="sm"
           @click="updateData"
       />
-      <CreateMusicDialog ref="RefChildren" @fetchData="fetchData" :rowData="rowData">></CreateMusicDialog>
+      <CreateRoleDialog ref="RefChildren" @fetchData="fetchData" :rowData="rowData">></CreateRoleDialog>
 
       <q-dialog v-model="confirmDelete" persistent>
         <q-card>
@@ -187,18 +145,13 @@
 
           <q-card-actions align="right">
             <q-btn flat label="取消" color="primary" v-close-popup />
-            <q-btn flat label="确定" color="primary" v-close-popup @click="deleteMusicById()"/>
+            <q-btn flat label="确定" color="primary" v-close-popup @click="deleteRoleById()"/>
           </q-card-actions>
         </q-card>
       </q-dialog>
 
     </div>
-
-
-
   </div>
-
-
 </template>
 
 <script setup>
@@ -206,7 +159,8 @@ import {computed, ref, onMounted, defineComponent} from "vue";
 import {getPageByUsername} from "../../api/user.js";
 import {nextTick,watch,watchEffect, toRefs} from 'vue'
 
-import CreateMusicDialog from "../../components/music/CreateMusicDialog.vue";
+import CreateRoleDialog from "../../components/role/CreateRoleDialog.vue";
+
 import ArtistSelectionElementUI from "../../components/common/artistSelection/ArtistSelectionElementUI.vue"
 
 import {
@@ -216,28 +170,21 @@ import {
   getPageByMusicName
 } from "../../api/music.js";
 import {musicStatusColor} from '../../utils/musicSlotColorEnum.js';
-import {useQuasar,LoadingBar} from "quasar";
+import {useQuasar} from "quasar";
 import {deletePlayList} from "../../api/play_list.js";
 import {freeMusicFromFreeMp3, searchFromGM} from "../../api/freeMusic.js";
 import axios from "axios";
 import {encode} from "../../utils/encodeObsfuscator.js";
+import {deleteTag, getPageByTagName} from "../../api/tag.js";
+import {deleteRole, getPageByRoleName} from "../../api/role.js";
 
 const $q = useQuasar()
 
-// $q.loadingBar.setDefaults({
-//
-// })
-
 const columns = [
   {name:"id",label: 'Id', field: 'id', sortable: true, align: 'left'},
-  {name:"name",label: '歌曲名', field: 'name', sortable: true, align: 'left'},
-  {name:"description",label: '简介', field: 'description', sortable: true, align: 'left'},
-  {name:"artist",label: '歌手名', field: 'artist', align: 'left'},
+  {name:"name",label: '角色英文名', field: 'name', sortable: true, align: 'left'},
+  {name:"title",label: '角色中文名', field: 'title',align: 'left'},
 
-  {name:"album",label: '专辑名', field: 'album', sortable: true, align: 'left'},
-  {name:"tag",label: '标签', field: 'tag',  align: 'left'},
-  {name:"playMusic",label: '音乐播放', field: 'playMusic', align: 'left'},
-  {name:"musicState",label: '上架状态', field: 'musicState', sortable: true, align: 'left'},
   {name:"operation",label: '操作', field: 'operation', align: 'left'},
 
 
@@ -264,9 +211,6 @@ const rowId=ref(null)
 
 const wantPlay=ref(false)
 const filter =ref(null)
-
-const bar = ref(null)
-
 
 //子组件
 const RefChildren = ref(null)
@@ -317,10 +261,6 @@ const updateData = () => {
 // 多值监听
 watch([pagination,current],([newPagination,newCurrent],[oldPagination,oldCurrent])=>{
   console.log(newCurrent)
-  // LoadingBar.increment(0.2)
-
-
-  // LoadingBar.increment(0.2)
 
   getPageByName(newCurrent,newPagination.rowsPerPage,"")
 
@@ -366,100 +306,92 @@ const getPageByName =(pageNum,pageSize,SearchWord)=>{
   // }
   //
 
-  // const barRef=bar.value
-  // barRef.start()
-  // LoadingBar.increment(0.8)
-
-  // $q.loadingBar.stop()
-
-  getPageByMusicName(pageNum, pageSize, SearchWord).then(res => {
-    // $q.loadingBar.stop()
-
-    // LoadingBar.stop()
-
+  getPageByRoleName(pageNum, pageSize, SearchWord).then(res=>{
     console.log(pagination.value.rowsPerPage)
     console.log(res);
-    res.data.records.map(item=>{item.tagLabel='音乐播放'})
     rows.value = res.data.records;
-
-
-    // barRef.stop()
-
-    rows.value.map((item,index)=>{
-      // let searchSwitch={song:1,album:0,singer:0,tagSong:0,mvSong:0,songlist:0,bestShow:1}
-      let searchWord = item.name+'-'+item.artistVoList[0].name
-      // let searchWord = item.name+'-'+item.artistVoList[0].name
-
-        let data =encode('text='+searchWord+'&page=1'+'&type=migu')
-      // console.log(data)
-         data =data.split("&")[0].split("=")[1]
-        let v =2
-        // console.log(data)
-
-        let params = new URLSearchParams();
-        params.append("data",data)
-        params.append("v",v)
-
-        freeMusicFromFreeMp3(params).then(res=> {
-        // console.log( res.data)
-        // console.log(res.data.data.list)
-        // console.log(item.name)
-        // res.data.data.list=res.data.data.list.filter(music=>music.name.indexOf(item.name) !== -1)
-          let dataList =res.data.data.list
-          res.data.data.list=res.data.data.list.filter(music=>music.name===(item.name))
-
-          if (res.data.data.list.length === 0) {
-            console.log(item.name,item.name,item.name)
-            res.data.data.list = dataList.filter(music => music.name.indexOf(item.name) !== -1)
-
-            if (res.data.data.list.length !== 0) {
-              console.log(res.data.data.list[0].name)
-            }
-          }
-          console.log( res.data.data)
-        if ( res.data.data.list[0]) {
-
-          // console.log(res.data.data.list[0])
-          let ourArtist = item.artistVoList[0].name
-          // console.log(ourArtist)
-          let MGArtist =res.data.data.list.filter(list=>list.artist.includes(ourArtist))
-          console.log(MGArtist)
-
-
-
-          if (res.data.data.list != null && (MGArtist.length!== 0)  ) {
-            item.file.url = res.data.data.list[0].url
-            item.tagLabel='√音乐播放'
-            item.mgMusic=res.data.data.list[0]
-          }
-
-
-        }
-
-      })
-
-    })
-
     total.value = res.data.total;
-    // pagination.value.rowsNumber=total.value;
-
-    sortNum.value=([ 3, 5, 7, 10, 15, 20, 25, 50,total.value]);
-
-    if (res.data.records === null){
-      current.value=1;
-    }
-
   })
+  //
+  // getPageByMusicName(pageNum, pageSize, SearchWord).then(res => {
+  //   console.log(pagination.value.rowsPerPage)
+  //   console.log(res);
+  //   res.data.records.map(item=>{item.tagLabel='音乐播放'})
+  //   rows.value = res.data.records;
+  //
+  //
+  //   rows.value.map((item,index)=>{
+  //     // let searchSwitch={song:1,album:0,singer:0,tagSong:0,mvSong:0,songlist:0,bestShow:1}
+  //     let searchWord = item.name+'-'+item.artistVoList[0].name
+  //     // let searchWord = item.name+'-'+item.artistVoList[0].name
+  //
+  //     let data =encode('text='+searchWord+'&page=1'+'&type=migu')
+  //     // console.log(data)
+  //     data =data.split("&")[0].split("=")[1]
+  //     let v =2
+  //     // console.log(data)
+  //
+  //     let params = new URLSearchParams();
+  //     params.append("data",data)
+  //     params.append("v",v)
+  //
+  //     freeMusicFromFreeMp3(params).then(res=> {
+  //       // console.log( res.data)
+  //       // console.log(res.data.data.list)
+  //       // console.log(item.name)
+  //       // res.data.data.list=res.data.data.list.filter(music=>music.name.indexOf(item.name) !== -1)
+  //       let dataList =res.data.data.list
+  //       res.data.data.list=res.data.data.list.filter(music=>music.name===(item.name))
+  //
+  //       if (res.data.data.list.length === 0) {
+  //         console.log(item.name,item.name,item.name)
+  //         res.data.data.list = dataList.filter(music => music.name.indexOf(item.name) !== -1)
+  //
+  //         if (res.data.data.list.length !== 0) {
+  //           console.log(res.data.data.list[0].name)
+  //         }
+  //       }
+  //       console.log( res.data.data)
+  //       if ( res.data.data.list[0]) {
+  //
+  //         // console.log(res.data.data.list[0])
+  //         let ourArtist = item.artistVoList[0].name
+  //         // console.log(ourArtist)
+  //         let MGArtist =res.data.data.list.filter(list=>list.artist.includes(ourArtist))
+  //         console.log(MGArtist)
+  //
+  //
+  //
+  //         if (res.data.data.list != null && (MGArtist.length!== 0)  ) {
+  //           item.file.url = res.data.data.list[0].url
+  //           item.tagLabel='√音乐播放'
+  //           item.mgMusic=res.data.data.list[0]
+  //         }
+  //
+  //
+  //       }
+  //
+  //     })
+  //
+  //   })
+  //
+  //   total.value = res.data.total;
+  //   // pagination.value.rowsNumber=total.value;
+  //
+  //   sortNum.value=([ 3, 5, 7, 10, 15, 20, 25, 50,total.value]);
+  //
+  //   if (res.data.records === null){
+  //     current.value=1;
+  //   }
+  //
+  // })
 }
 
 const fetchData = () => {
-
-
   getPageByName(current.value,pagination.value.rowsPerPage,"")
 }
 
 const searchDataByName =()=>{
-
   getPageByName(current.value,pagination.value.rowsPerPage,filter.value)
 }
 
@@ -506,9 +438,9 @@ const openConfirmDialog =(id)=>{
 
 }
 
-const deleteMusicById =()=>{
+const deleteRoleById =()=>{
   if (rowId.value !== null) {
-    deleteMusic(rowId.value).then(res => {
+    deleteRole(rowId.value).then(res => {
       console.log(res)
       fetchData();
       $q.notify({message: '删除成功', position: "top", type: 'positive',});

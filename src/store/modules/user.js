@@ -2,7 +2,7 @@
 
 
 import {getCurrentUser, getToken, removeCurrentUser, removeToken, setCurrentUser, setToken} from "../../utils/auth.js";
-import login, {createUserRequest, getCurrentUserByToken} from "../../api/user.js";
+import  {login,createUserRequest, getCurrentUserByToken} from "../../api/user.js";
 //存储初值
 const state = () => ({
     //getToken来自auth，用的是依赖jk-cookie方法来获取token，然后吧token放在vuex里面

@@ -433,7 +433,7 @@ const deleteMusicById =()=>{
      //将a标签的href设置为url
      a.href = url;
      //将a标签的download属性设置为我们想要的文件名即可
-     a.download =  row.name+'-'+row.singers.map(item=>item.name).join('/')+'.'+'lyc';
+     a.download =  row.name+'-'+row.singers.map(item=>item.name).join('/')+'.'+'lrc';
      //然后我们设置一个a标签的click事件，这样就会开始下载了
      a.click();
      //销毁我们前面设置的a标签

@@ -143,9 +143,12 @@ const props = defineProps(
 const uploadedGF = (res) => {
 
   file.value = res;
+  console.log(res)
+
   if (file.value !==null){
     fileId.value=file.value.id;
-    console.log(file.value)
+    // console.log(file.value)
+    console.log(fileId.value)
   }
 
 }
@@ -155,7 +158,7 @@ const createAlbum = () => {
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
   album.value = {name: name.value, description: description.value, photoId:fileId.value,musicIdList:musicIdListFromChild.value,albumArtistIdList:artistIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value};
 
-
+  console.log(album.value)
 
   createAlbumRequest(album.value).then(res => {
     console.log(res);
@@ -170,6 +173,7 @@ const createAlbum = () => {
 
 const editAlbum = ()=>{
   album.value = {name: name.value, description: description.value, photoId:fileId.value,musicIdList:musicIdListFromChild.value,albumArtistIdList:artistIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value};
+  console.log(album.value)
 
   if (album.value.recommended === false){
     album.value.recommendFactor =0;

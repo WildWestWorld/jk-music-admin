@@ -1,13 +1,13 @@
 <template>
   <div class="screening-config">
-    <div class="title">选择专辑</div>
-    <el-select-v2 @change=showValue  	 v-model="selectAlbumList"     :options="AlbumList"
+    <div class="title">选择标签</div>
+    <el-select-v2 @change=showValue  	 v-model="selectTagList"     :options="TagList"
                   filterable  multiple clearable
                   collapse-tags
                   collapse-tags-tooltip
                   popper-class="test"
                   :teleported="true"
-                  size="large" placeholder="请选择专辑"  style=" width:100%;max-width: 320px; " >
+                  size="large" placeholder="请选择标签"  style=" width:100%;max-width: 320px; " >
 
 
       <template #default="{ item }" style="width: 100%;">
@@ -26,63 +26,68 @@ import 'element-plus/es/components/message/style/css'
 import { ElMessage,ElSelect,ElOption,ElCard,ElSelectV2 } from 'element-plus'
 
 import {onMounted, ref,onBeforeMount} from 'vue'
-import {defineProps} from "vue"
-import {getArtistList, getArtistSelectionList} from "../../../api/artist.js";
+import {defineProps,defineExpose} from "vue"
+import {getArtistList} from "../../../api/artist.js";
 import {getMusicList} from "../../../api/music.js";
-import {getAlbumList, getAlbumSelectionList} from "../../../api/album.js";
+import {getTagList} from "../../../api/tag.js";
 const options=ref([])
-const selectAlbumList = ref('')
-const AlbumList =ref([])
-const initAlbumList =ref([])
+const selectTagList = ref('')
+const TagList =ref([])
+const initTagList =ref([])
 const selectOptionWidth =ref(null)
+
 
 onMounted(()=> {
 
-
-  getAlbumSelectionList().then(res => {
-    // //传入已有的歌手
-    if (props.AlbumListFromFather !==null && props.AlbumListFromFather.length !== 0){
-      selectAlbumList.value=props.AlbumListFromFather;
-      console.log(props)
-    }
-    initAlbumList.value = res.data
-
-    AlbumList.value=initAlbumList.value
-
-
-
-    AlbumList.value=AlbumList.value.map((item)=>({
-      value:item.id,
-      // label:item.name,
-
-      label:item.name
-     }))
-
-  })
+  getTagListData()
 
 
 
 })
 
+const getTagListData=()=>{
+
+  getTagList().then(res => {
+    // //传入已有的歌手
+    if (props.TagListFromFather !==null){
+      selectTagList.value=props.TagListFromFather;
+      console.log(props)
+    }
+    initTagList.value = res.data
+
+    TagList.value=initTagList.value
 
 
 
-const emit =defineEmits(['AlbumSelectionElementUI']);
+    TagList.value=TagList.value.map((item)=>({
+      value:item.id,
+      // label:item.name,
+
+      label:item.name,
+      }))
+
+  })
+}
+
+
+const emit =defineEmits(['TagSelectionElementUI']);
 
 
 
 
 const props = defineProps(
     {
-      AlbumListFromFather:{type:Array,default:[]},
+      TagListFromFather:{type:Array,default:[]},
     })
 
 
-
+defineExpose({
+  getTagListData
+})
 
 
 const showValue=()=>{
-  emit('AlbumSelectionElementUI',selectAlbumList.value)
+  emit('TagSelectionElementUI',selectTagList.value)
 }
 
 

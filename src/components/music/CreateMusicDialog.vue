@@ -26,6 +26,14 @@
       </q-card-section>
 
         <q-card-section class="q-pt-none">
+          <AlbumSelectionElementUIV2 @AlbumSelectionElementUI="inputSelectAlbumList" :AlbumListFromFather="albumIdListFromFather"></AlbumSelectionElementUIV2>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <TagSelectionElementUIV2 @TagSelectionElementUI="inputSelectTagList" :TagListFromFather="tagIdListFromFather"></TagSelectionElementUIV2>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
           <Uploader :label="musicPhotoLabel" @uploadedGF="uploadedGF" :fileEdit="musicPhotoFileEdit"></Uploader>
         </q-card-section>
 
@@ -59,6 +67,8 @@ import Uploader from "../common/uploader/Uploader.vue"
 import CosUploader from "../common/uploader/uploaderComponent/useCosUploader.js";
 import ArtistSelectionElementUI from "../common/artistSelection/ArtistSelectionElementUI.vue"
 import ArtistSelectionElementUIV2 from "../common/artistSelection/ArtistSelectionElementUIV2.vue"
+import AlbumSelectionElementUIV2 from "../common/albumSelection/AlbumSelectionElementUIV2.vue"
+import TagSelectionElementUIV2 from "../common/tagSelection/TagSelectionElementUIV2.vue"
 
 import ArtistSelection from "../common/artistSelection/ArtistSelection.vue"
 
@@ -80,8 +90,15 @@ const musicPhotoFileEdit =ref(null)
 
 const id =ref(null)
 const music = ref(props.rowData||{name: '', description: '', file: null})
-const artistIdListFromChild=ref([]);
-const artistIdListFromFather=ref([]);
+
+const artistIdListFromChild=ref(null);
+const artistIdListFromFather=ref(null);
+
+const albumIdListFromChild=ref(null);
+const albumIdListFromFather=ref(null);
+
+const tagIdListFromChild=ref(null);
+const tagIdListFromFather=ref(null);
 const isEdit =ref(null)
 
 
@@ -105,10 +122,6 @@ const props = defineProps(
 )
 
 
-const inputSelectArtistList=(artistIdList)=>{
-  artistIdListFromChild.value=artistIdList
-  console.log(artistIdListFromChild.value)
-}
 
 
 const uploadedGF = (res) => {
@@ -154,7 +167,7 @@ if (res.label !== null) {
 
 const createMusic = () => {
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
-  music.value = {name: name.value, description: description.value, fileId:fileId.value,file: file.value,photoId:musicPhotoFileId.value,artistIdList:artistIdListFromChild.value};
+  music.value = {name: name.value, description: description.value, fileId:fileId.value,file: file.value,photoId:musicPhotoFileId.value,artistIdList:artistIdListFromChild.value,albumIdList:albumIdListFromChild.value,tagIdList:tagIdListFromChild.value};
 
 
 
@@ -170,7 +183,7 @@ const createMusic = () => {
 }
 
 const editMusic = ()=>{
-  music.value = {id:id.value,name: name.value, description: description.value, fileId:fileId.value,file: file.value,photoId:musicPhotoFileId.value,artistIdList:artistIdListFromChild.value};
+  music.value = {id:id.value,name: name.value, description: description.value, fileId:fileId.value,file: file.value,photoId:musicPhotoFileId.value,artistIdList:artistIdListFromChild.value,albumIdList:albumIdListFromChild.value,tagIdList:tagIdListFromChild.value};
 
   updateMusic(music.value.id,music.value).then(res=>{
     console.log(res)
@@ -197,6 +210,13 @@ const togglePrompt = () => {
   id.value =null;
   artistIdListFromChild.value=null;
   artistIdListFromFather.value=null;
+
+  albumIdListFromChild.value=null;
+  albumIdListFromFather.value=null;
+
+
+  tagIdListFromChild.value=null;
+  tagIdListFromFather.value=null;
 
   //转换对话框的显示状态
   prompt.value = !prompt.value
@@ -227,7 +247,15 @@ const togglePromptEdit =()=>{
 
   id.value =null;
   artistIdListFromChild.value=null
+  artistIdListFromFather.value=null;
 
+
+  albumIdListFromChild.value=null;
+  albumIdListFromFather.value=null;
+
+
+  tagIdListFromChild.value=null;
+  tagIdListFromFather.value=null;
 
   //转换对话框的显示状态
   prompt.value = !prompt.value
@@ -251,9 +279,27 @@ const togglePromptEdit =()=>{
   artistIdListFromChild.value=props.rowData.artistVoList.map(item=>item.id)
   artistIdListFromFather.value=artistIdListFromChild.value
 
+  albumIdListFromChild.value=props.rowData.albumVoList.map(item=>item.id);
+  albumIdListFromFather.value=albumIdListFromChild.value;
+
+  tagIdListFromChild.value=props.rowData.tagList.map(item=>item.id);
+  tagIdListFromFather.value=tagIdListFromChild.value;
 }
 
+const inputSelectArtistList=(artistIdList)=>{
+  artistIdListFromChild.value=artistIdList
+  console.log(artistIdListFromChild.value)
+}
 
+const inputSelectAlbumList=(albumIdList)=>{
+  albumIdListFromChild.value=albumIdList
+  console.log(albumIdListFromChild.value)
+}
+
+const inputSelectTagList=(tagIdList)=>{
+  tagIdListFromChild.value=tagIdList
+  console.log(tagIdListFromChild.value)
+}
 
 //暴露函数给父组件
 defineExpose({

@@ -5,52 +5,25 @@
       <el-card shadow="always" style="width: 100%">
 
         <q-card-section>
-          <div class="text-h6">新增用户</div>
+          <div class="text-h6">新增角色</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-input filled v-model="username" label="用户名" autofocus lazy-rules
-                   :rules="[
-                       val => val !== null && val !== '' || '请输入用户名',
-                       val => val && 64>=val.length >= 4 || '用户名长度应该在4个字符到64个字符之间',
-
-                       ]"/>
+          <q-input filled v-model="name" label="角色英文名" autofocus lazy-rules
+                   :rules="[ val => val && val.length > 0 || '请输入角色英文名']"/>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-input filled v-model="password" label="密码" autofocus lazy-rules
-                   :rules="[
-                       val => val !== null && val !== '' || '请输入密码',
-                       val => val && 64>=val.length >= 6 || '密码长度应该在6个字符到64个字符之间'
-                       ]"/>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          <q-input filled v-model="nickname" label="昵称" autofocus lazy-rules
-
-                   :rules="[
-                       val => val !== null && val !== '' || '请输入昵称',
-                       val => val && 64>=val.length >= 4 || '昵称长度应该在4个字符到64个字符之间',
-                       ]"/>
+          <q-input filled v-model="title" label="角色中文名" autofocus lazy-rules
+                   :rules="[ val => val && val.length > 0 || '请输入角色英文名']"/>
         </q-card-section>
         <q-card-section class="q-pt-none">
-
-          <div class="text-h8">选择性别</div>
-
-            <q-radio v-model="gender" val="男" label="男" color="teal" />
-            <q-radio v-model="gender" val="女" label="女" color="orange" />
-            <q-radio v-model="gender" val="未知" label="未知" color="red" />
-
-
+          <UserSelectionElementUIV2 @UserSelectionElementUI="inputSelectUserList" :UserListFromFather="userIdListFromFather" ></UserSelectionElementUIV2>
         </q-card-section>
 
-        <q-card-section class="q-pt-none">
-          <MusicSelectionElementUIV2 @MusicSelectionElementUI="inputSelectMusicList" :MusicListFromFather="musicIdListFromFather" ref="RefChildrenMusic"></MusicSelectionElementUIV2>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          <PlayListSelectionElementUIV2 @PlaySelectionElementUI="inputSelectPlayList" :PlayListFromFather="playListIdListFromFather"></PlayListSelectionElementUIV2>
-        </q-card-section>
+<!--        <q-card-section class="q-pt-none">-->
+<!--          <PlayListSelectionElementUIV2 @PlaySelectionElementUI="inputSelectPlayList" :PlayListFromFather="playListIdListFromFather"></PlayListSelectionElementUIV2>-->
+<!--        </q-card-section>-->
 
 
         <!--        <q-card-section class="q-pt-none">-->
@@ -96,7 +69,7 @@
         <!--        </q-card-section>-->
 
         <q-card-actions align="right" class="text-primary">
-          <q-btn label="确认" color="primary" v-close-popup @click="isEdit?editUser():createUser()"/>
+          <q-btn label="确认" color="primary" v-close-popup @click="isEdit?editRole():createRole()"/>
           <q-btn flat label="取消" v-close-popup/>
         </q-card-actions>
 
@@ -114,19 +87,21 @@ import {ref,defineProps,nextTick} from "vue"
 
 import {useStore} from "vuex";
 import {useQuasar} from "quasar";
-import {createUserRequest, updateUser} from "../../api/user.js";
+import {createUserRequest} from "../../api/user.js";
 import {createMusicRequest, updateMusic} from "../../api/music.js";
 
 import Uploader from "../common/uploader/Uploader.vue"
 import CosUploader from "../common/uploader/uploaderComponent/useCosUploader.js";
 import MusicSelectionElementUIV2 from "../common/musicSelection/MusicSelectionElementUIV2.vue"
 import PlayListSelectionElementUIV2 from "../common/playListSelection/PlayListSelectionElementUIV2.vue"
+import UserSelectionElementUIV2 from "../common/userSelection/UserSelectionElementUIV2.vue"
 
 
 import {createArtistRequest, updateArtist} from "../../api/artist.js";
 
 import {createPlayListRequest, updatePlayList} from "../../api/play_list.js";
 import {createTagRequest, updateTag} from "../../api/tag.js";
+import {createRoleRequest, updateRole} from "../../api/role.js";
 
 
 const alert = ref(false);
@@ -134,10 +109,7 @@ const confirm = ref(false);
 
 const prompt = ref(false);
 const name = ref('');
-const username =ref('');
-const password =ref('');
-const nickname =ref('');
-const gender =ref(null);
+const title = ref('');
 
 const description=ref('');
 const file = ref(null)
@@ -157,9 +129,14 @@ const playListIdListFromChild=ref(null);
 const playListIdListFromFather=ref(null);
 
 
+
+const userIdListFromChild=ref(null);
+const userIdListFromFather=ref(null);
+
 const artist = ref(props.rowData||{name: '', remark: '', file: null})
 const playList=ref(null)
-const user=ref(null)
+const tag=ref(null)
+const role=ref(null)
 
 const isEdit =ref(null)
 
@@ -209,13 +186,14 @@ const initMusicData=()=>{
 }
 
 
-const createUser = () => {
+const createRole = () => {
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
   // playList.value = {name: name.value, description: description.value, coverId:fileId.value,musicIdList:musicIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
-  user.value ={username:username.value,password:password.value,nickname:nickname.value,gender:gender.value,RoleIdList:RoleIdListFromChild.value}
+  // tag.value ={name:name.value,musicIdList:musicIdListFromChild.value,playListIdList:playListIdListFromChild.value}
+  role.value ={name:name.value,title:title.value}
 
 
-  createUserRequest(user.value).then(res => {
+  createRoleRequest(role.value).then(res => {
     console.log(res);
     fetchDataFromFather();
     $q.notify({message: '创建成功', position: "top", type: 'positive',});
@@ -226,14 +204,15 @@ const createUser = () => {
 
 }
 
-const editUser = ()=>{
+const editRole = ()=>{
   // playList.value = {id:id.value,name: name.value, description: description.value, coverId:fileId.value,musicIdList:musicIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
   // if (playList.value.recommended === false){
   //   playList.value.recommendFactor =0;
   // }
-  user.value ={id:id.value,name:name.value,musicIdList:musicIdListFromChild.value,playListIdList:playListIdListFromChild.value}
+  // tag.value ={id:id.value,name:name.value,musicIdList:musicIdListFromChild.value,playListIdList:playListIdListFromChild.value}
+  role.value ={id:id.value,name:name.value,title:title.value,userIdList:userIdListFromChild.value}
 
-  updateUser(user.value.id,user.value).then(res=>{
+  updateRole(role.value.id,role.value).then(res=>{
     console.log(res)
 
     fetchDataFromFather();
@@ -261,6 +240,9 @@ const togglePrompt = () => {
   playListIdListFromChild.value=null
   playListIdListFromFather.value=null
 
+  userIdListFromChild.value=null
+  userIdListFromFather.value=null
+
   console.log(isEdit.value)
   //转换对话框的显示状态
   prompt.value = !prompt.value
@@ -270,6 +252,7 @@ const togglePrompt = () => {
   //清空input
   name.value = ''
   description.value = ''
+  title.value = ''
 
 
 
@@ -279,6 +262,7 @@ const togglePromptEdit =()=>{
 
   isEdit.value=true;
   name.value='';
+  title.value='';
 
   file.value=null;
   fileId.value=null;
@@ -291,6 +275,10 @@ const togglePromptEdit =()=>{
   playListIdListFromChild.value=null
   playListIdListFromFather.value=null
 
+
+  userIdListFromChild.value=null
+  userIdListFromFather.value=null
+
   nextTick(()=>{
     //转换对话框的显示状态
     prompt.value = !prompt.value
@@ -301,6 +289,8 @@ const togglePromptEdit =()=>{
 
 
   name.value=props.rowData.name;
+  title.value=props.rowData.title;
+
   // description.value=props.rowData.description;
 
   // if (props.rowData.photo !== null){
@@ -315,12 +305,12 @@ const togglePromptEdit =()=>{
   // recommended.value=props.rowData.recommended
   // special.value=props.rowData.special
 
-  musicIdListFromChild.value=props.rowData.musicList.map(item=>item.id)
-  musicIdListFromFather.value=musicIdListFromChild.value
-
-
-  playListIdListFromChild.value=props.rowData.playList.map(item=>item.id)
-  playListIdListFromFather.value=playListIdListFromChild.value
+  // musicIdListFromChild.value=props.rowData.musicList.map(item=>item.id)
+  // musicIdListFromFather.value=musicIdListFromChild.value
+  //
+  //
+  userIdListFromChild.value=props.rowData.userList.map(item=>item.id)
+  userIdListFromFather.value=userIdListFromChild.value
 
 }
 
@@ -333,7 +323,10 @@ const inputSelectPlayList=(playListIdList)=>{
   playListIdListFromChild.value=playListIdList
   console.log(playListIdListFromChild.value)
 }
-
+const inputSelectUserList=(userIdList)=>{
+  userIdListFromChild.value=userIdList
+  console.log(userIdListFromChild.value)
+}
 //暴露函数给父组件
 defineExpose({
   togglePrompt,

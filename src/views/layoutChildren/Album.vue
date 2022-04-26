@@ -30,6 +30,13 @@
         </q-td>
       </template>
 
+      <template v-slot:body-cell-artist="props">
+        <q-td :props="props" key="id">
+          <div>
+            <q-badge outline :color="props.row.albumArtistList.length !== 0?'red':'grey'" :label="props.row.albumArtistList.length !== 0 ? props.row.albumArtistList.map(item=>item.name).join('/'):'暂未选定歌手' " />
+          </div>
+        </q-td>
+      </template>
 
       <template v-slot:body-cell-special="props">
         <q-td :props="props" key="id">
@@ -173,6 +180,7 @@ const columns = [
   {name:"id",label: 'Id', field: 'id', sortable: true, align: 'left'},
   {name:"name",label: '专辑名', field: 'name', sortable: true, align: 'left'},
   {name:"description",label: '专辑描述', field: 'description', sortable: true, align: 'left'},
+  {name:"artist",label: '歌手名', field: 'artist', align: 'left'},
 
   {name:"recommended",label: '是否推荐', field: 'recommended', sortable: true, align: 'left'},
   {name:"recommendFactor",label: '推荐指数', field: 'recommendFactor', sortable: true, align: 'left'},

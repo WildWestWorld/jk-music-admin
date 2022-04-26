@@ -10,6 +10,10 @@ export const getArtistList =(searchWord)=>{
     return request.get("/artist",{params:{searchWord}})
 }
 
+export const getArtistSelectionList =(searchWord)=>{
+    return request.get("/artist/selection",{params:{searchWord}})
+}
+
 export const createArtistRequest =(artist)=>{
     return request.post("/artist",artist)
 }

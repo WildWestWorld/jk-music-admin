@@ -51,6 +51,10 @@
         <MusicSelectionElementUIV2 @MusicSelectionElementUI="inputSelectMusicList" :MusicListFromFather="musicIdListFromFather"></MusicSelectionElementUIV2>
       </q-card-section>
 
+        <q-card-section class="q-pt-none">
+          <TagSelectionElementUIV2 @TagSelectionElementUI="inputSelectTagList" :TagListFromFather="tagIdListFromFather"></TagSelectionElementUIV2>
+        </q-card-section>
+
       <q-card-section class="q-pt-none">
         <Uploader :label="label" @uploadedGF="uploadedGF" :fileEdit="fileEdit"></Uploader>
       </q-card-section>
@@ -80,6 +84,7 @@ import {createMusicRequest, updateMusic} from "../../api/music.js";
 import Uploader from "../common/uploader/Uploader.vue"
 import CosUploader from "../common/uploader/uploaderComponent/useCosUploader.js";
 import MusicSelectionElementUIV2 from "../common/musicSelection/MusicSelectionElementUIV2.vue"
+import TagSelectionElementUIV2 from "../common/tagSelection/TagSelectionElementUIV2.vue"
 
 import {createArtistRequest, updateArtist} from "../../api/artist.js";
 
@@ -105,6 +110,9 @@ const musicIdList= ref(null)
 const musicIdListFromChild=ref([]);
 const musicIdListFromFather=ref([]);
 
+
+const tagIdListFromChild=ref(null);
+const tagIdListFromFather=ref(null);
 
 const artist = ref(props.rowData||{name: '', remark: '', file: null})
 const playList=ref(null)
@@ -144,7 +152,7 @@ const uploadedGF = (res) => {
 
 const createPlayList = () => {
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
-  playList.value = {name: name.value, description: description.value, coverId:fileId.value,musicIdList:musicIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
+  playList.value = {name: name.value, description: description.value, coverId:fileId.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value,musicIdList:musicIdListFromChild.value,tagIdList:tagIdListFromChild.value};
 
 
 
@@ -160,7 +168,7 @@ const createPlayList = () => {
 }
 
 const editPlayList = ()=>{
-  playList.value = {id:id.value,name: name.value, description: description.value, coverId:fileId.value,musicIdList:musicIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
+  playList.value = {id:id.value,name: name.value, description: description.value, coverId:fileId.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value,musicIdList:musicIdListFromChild.value,tagIdList:tagIdListFromChild.value};
   if (playList.value.recommended === false){
     playList.value.recommendFactor =0;
   }
@@ -189,6 +197,9 @@ const togglePrompt = () => {
   musicIdListFromChild.value=null
   musicIdListFromFather.value=null
 
+  tagIdListFromChild.value=null;
+  tagIdListFromFather.value=null;
+
   console.log(isEdit.value)
   //转换对话框的显示状态
   prompt.value = !prompt.value
@@ -215,6 +226,9 @@ const togglePromptEdit =()=>{
 
   musicIdListFromChild.value=null
   musicIdListFromFather.value=null
+
+  tagIdListFromChild.value=null;
+  tagIdListFromFather.value=null;
 
   nextTick(()=>{
     //转换对话框的显示状态
@@ -243,13 +257,19 @@ const togglePromptEdit =()=>{
   musicIdListFromChild.value=props.rowData.musicList.map(item=>item.id)
   musicIdListFromFather.value=musicIdListFromChild.value
 
-
+  tagIdListFromChild.value=props.rowData.tagList.map(item=>item.id);
+  tagIdListFromFather.value=tagIdListFromChild.value;
 
 }
 
 const inputSelectMusicList=(musicIdList)=>{
   musicIdListFromChild.value=musicIdList
   console.log(musicIdListFromChild.value)
+}
+
+const inputSelectTagList=(tagIdList)=>{
+  tagIdListFromChild.value=tagIdList
+  console.log(tagIdListFromChild.value)
 }
 
 //暴露函数给父组件

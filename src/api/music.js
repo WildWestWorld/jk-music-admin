@@ -4,6 +4,10 @@ export const getMusicList =(searchWord)=>{
     return request.get("/music",{params:{searchWord}})
 }
 
+export const getMusicSelectionList =(searchWord)=>{
+    return request.get("/music/selection",{params:{searchWord}})
+}
+
 export const getPageByMusicName=( pageNum,pageSize,searchWord)=>{
     return request.get("/music/pages",{params:{ pageNum,pageSize,searchWord}})
 }

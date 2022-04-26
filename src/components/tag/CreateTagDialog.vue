@@ -5,44 +5,14 @@
       <el-card shadow="always" style="width: 100%">
 
         <q-card-section>
-          <div class="text-h6">新增用户</div>
+          <div class="text-h6">新增标签</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-input filled v-model="username" label="用户名" autofocus lazy-rules
-                   :rules="[
-                       val => val !== null && val !== '' || '请输入用户名',
-                       val => val && 64>=val.length >= 4 || '用户名长度应该在4个字符到64个字符之间',
-
-                       ]"/>
+          <q-input filled v-model="name" label="标签名字" autofocus lazy-rules
+                   :rules="[ val => val && val.length > 0 || '请输入标签名字']"/>
         </q-card-section>
 
-        <q-card-section class="q-pt-none">
-          <q-input filled v-model="password" label="密码" autofocus lazy-rules
-                   :rules="[
-                       val => val !== null && val !== '' || '请输入密码',
-                       val => val && 64>=val.length >= 6 || '密码长度应该在6个字符到64个字符之间'
-                       ]"/>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          <q-input filled v-model="nickname" label="昵称" autofocus lazy-rules
-
-                   :rules="[
-                       val => val !== null && val !== '' || '请输入昵称',
-                       val => val && 64>=val.length >= 4 || '昵称长度应该在4个字符到64个字符之间',
-                       ]"/>
-        </q-card-section>
-        <q-card-section class="q-pt-none">
-
-          <div class="text-h8">选择性别</div>
-
-            <q-radio v-model="gender" val="男" label="男" color="teal" />
-            <q-radio v-model="gender" val="女" label="女" color="orange" />
-            <q-radio v-model="gender" val="未知" label="未知" color="red" />
-
-
-        </q-card-section>
 
         <q-card-section class="q-pt-none">
           <MusicSelectionElementUIV2 @MusicSelectionElementUI="inputSelectMusicList" :MusicListFromFather="musicIdListFromFather" ref="RefChildrenMusic"></MusicSelectionElementUIV2>
@@ -53,50 +23,50 @@
         </q-card-section>
 
 
-        <!--        <q-card-section class="q-pt-none">-->
-        <!--          <q-input filled v-model="description" label="歌单描述" autofocus @keyup.enter="prompt = false"/>-->
-        <!--        </q-card-section>-->
+<!--        <q-card-section class="q-pt-none">-->
+<!--          <q-input filled v-model="description" label="歌单描述" autofocus @keyup.enter="prompt = false"/>-->
+<!--        </q-card-section>-->
 
-        <!--        <q-card-section class="q-pt-none">-->
-        <!--          <q-toggle-->
-        <!--              v-model="special"-->
-        <!--              checked-icon="check"-->
-        <!--              color="pink"-->
-        <!--              unchecked-icon="clear"-->
-        <!--              label="是否设置该歌单为特色歌单"-->
+<!--        <q-card-section class="q-pt-none">-->
+<!--          <q-toggle-->
+<!--              v-model="special"-->
+<!--              checked-icon="check"-->
+<!--              color="pink"-->
+<!--              unchecked-icon="clear"-->
+<!--              label="是否设置该歌单为特色歌单"-->
 
-        <!--          />-->
-        <!--        </q-card-section>-->
-
-
-        <!--        <q-card-section class="q-pt-none">-->
-        <!--          <q-toggle-->
-        <!--              v-model="recommended"-->
-        <!--              checked-icon="check"-->
-        <!--              color="bule"-->
-        <!--              unchecked-icon="clear"-->
-        <!--              label="是否推荐该歌单"-->
-        <!--              keep-color-->
-
-        <!--          />-->
-        <!--        </q-card-section>-->
+<!--          />-->
+<!--        </q-card-section>-->
 
 
+<!--        <q-card-section class="q-pt-none">-->
+<!--          <q-toggle-->
+<!--              v-model="recommended"-->
+<!--              checked-icon="check"-->
+<!--              color="bule"-->
+<!--              unchecked-icon="clear"-->
+<!--              label="是否推荐该歌单"-->
+<!--              keep-color-->
 
-        <!--        <q-card-section class="q-pt-none">-->
-        <!--          <q-input v-show="recommended" dense v-model="recommendFactor" label="推荐指数" autofocus @keyup.enter="prompt = false"/>-->
-        <!--        </q-card-section>-->
+<!--          />-->
+<!--        </q-card-section>-->
 
-        <!--        <q-card-section class="q-pt-none">-->
-        <!--          <MusicSelectionElementUIV2 @MusicSelectionElementUI="inputSelectMusicList" :MusicListFromFather="musicIdListFromFather"></MusicSelectionElementUIV2>-->
-        <!--        </q-card-section>-->
 
-        <!--        <q-card-section class="q-pt-none">-->
-        <!--          <Uploader :label="label" @uploadedGF="uploadedGF" :fileEdit="fileEdit"></Uploader>-->
-        <!--        </q-card-section>-->
+
+<!--        <q-card-section class="q-pt-none">-->
+<!--          <q-input v-show="recommended" dense v-model="recommendFactor" label="推荐指数" autofocus @keyup.enter="prompt = false"/>-->
+<!--        </q-card-section>-->
+
+<!--        <q-card-section class="q-pt-none">-->
+<!--          <MusicSelectionElementUIV2 @MusicSelectionElementUI="inputSelectMusicList" :MusicListFromFather="musicIdListFromFather"></MusicSelectionElementUIV2>-->
+<!--        </q-card-section>-->
+
+<!--        <q-card-section class="q-pt-none">-->
+<!--          <Uploader :label="label" @uploadedGF="uploadedGF" :fileEdit="fileEdit"></Uploader>-->
+<!--        </q-card-section>-->
 
         <q-card-actions align="right" class="text-primary">
-          <q-btn label="确认" color="primary" v-close-popup @click="isEdit?editUser():createUser()"/>
+          <q-btn label="确认" color="primary" v-close-popup @click="isEdit?editTag():createTag()"/>
           <q-btn flat label="取消" v-close-popup/>
         </q-card-actions>
 
@@ -114,7 +84,7 @@ import {ref,defineProps,nextTick} from "vue"
 
 import {useStore} from "vuex";
 import {useQuasar} from "quasar";
-import {createUserRequest, updateUser} from "../../api/user.js";
+import {createUserRequest} from "../../api/user.js";
 import {createMusicRequest, updateMusic} from "../../api/music.js";
 
 import Uploader from "../common/uploader/Uploader.vue"
@@ -134,11 +104,6 @@ const confirm = ref(false);
 
 const prompt = ref(false);
 const name = ref('');
-const username =ref('');
-const password =ref('');
-const nickname =ref('');
-const gender =ref(null);
-
 const description=ref('');
 const file = ref(null)
 const fileId =ref(null)
@@ -159,8 +124,7 @@ const playListIdListFromFather=ref(null);
 
 const artist = ref(props.rowData||{name: '', remark: '', file: null})
 const playList=ref(null)
-const user=ref(null)
-
+const tag=ref(null)
 const isEdit =ref(null)
 
 
@@ -209,13 +173,13 @@ const initMusicData=()=>{
 }
 
 
-const createUser = () => {
+const createTag = () => {
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
   // playList.value = {name: name.value, description: description.value, coverId:fileId.value,musicIdList:musicIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
-  user.value ={username:username.value,password:password.value,nickname:nickname.value,gender:gender.value,RoleIdList:RoleIdListFromChild.value}
+  tag.value ={name:name.value,musicIdList:musicIdListFromChild.value,playListIdList:playListIdListFromChild.value}
 
 
-  createUserRequest(user.value).then(res => {
+  createTagRequest(tag.value).then(res => {
     console.log(res);
     fetchDataFromFather();
     $q.notify({message: '创建成功', position: "top", type: 'positive',});
@@ -226,14 +190,14 @@ const createUser = () => {
 
 }
 
-const editUser = ()=>{
+const editTag = ()=>{
   // playList.value = {id:id.value,name: name.value, description: description.value, coverId:fileId.value,musicIdList:musicIdListFromChild.value,recommendFactor:recommendFactor.value,recommended:recommended.value,special:special.value};
   // if (playList.value.recommended === false){
   //   playList.value.recommendFactor =0;
   // }
-  user.value ={id:id.value,name:name.value,musicIdList:musicIdListFromChild.value,playListIdList:playListIdListFromChild.value}
+  tag.value ={id:id.value,name:name.value,musicIdList:musicIdListFromChild.value,playListIdList:playListIdListFromChild.value}
 
-  updateUser(user.value.id,user.value).then(res=>{
+  updateTag(tag.value.id,tag.value).then(res=>{
     console.log(res)
 
     fetchDataFromFather();

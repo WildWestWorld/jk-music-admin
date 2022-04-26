@@ -26,7 +26,7 @@ router.beforeEach(async (to, from, next) => {
            //res=currentUser
             const currentUser =await  store.dispatch('fetchCurrentUser');
            //查询是否有ADMIN角色
-           const adminRole=currentUser.data.roles.find(item=>{
+           const adminRole=currentUser.data.roleList.find(item=>{
                return item.name==="ROLE_ADMIN";
            });
            //如果有admin角色

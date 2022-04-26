@@ -98,6 +98,15 @@
       </template>
 
 
+      <!--表格中的某个字段设置样式 cell后面的英文就是该字段-->
+      <template v-slot:header-cell-recommendFactor="props" >
+        <q-th :props="props"  >
+          {{ props.col.label }}
+        </q-th>
+      </template>
+
+
+
     </q-table>
 
     <div class="row justify-center q-mt-md">
@@ -185,7 +194,7 @@ const confirmDelete=ref(null)
 
 const rowData =ref(null)
 
-
+const orderRecommend= ref(true);
 //子组件
 const RefChildren = ref(null)
 
@@ -331,6 +340,8 @@ const deleteArtistById =()=>{
   }
   rowId.value=null;
 }
+
+
 
 </script>
 

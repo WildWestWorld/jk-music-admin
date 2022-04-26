@@ -9,22 +9,122 @@
         title="Treats"
         :rows="rows"
         :columns="columns"
-        row-key="name"
+        row-key="id"
+        @update:pagination="updateData"
 
         v-model:pagination="pagination"
 
         v-model:rows-per-page-options="sortNum"
         :pagination-label="getPaginationLabel"
 
-
     >
+      <!--      <template v-slot:body-cell-你想使用插槽columns的名字="props">-->
+
+      <template v-slot:body-cell-name="props">
+        <q-td :props="props" key="id">
+          <div>
+            <q-badge  color="deep-orange-6" :label="props.value" />
+          </div>
+        </q-td>
+      </template>
+
+      <template v-slot:body-cell-roleList="props">
+        <q-td :props="props" key="id">
+          <div>
+            <q-badge outline :color="props.row.roleList.length !== 0?'blue':'grey'" :label="props.row.roleList.length !== 0 ? props.row.roleList.map(item=>item.title).join('/'):'暂未设置角色' " />
+          </div>
+        </q-td>
+      </template>
+
+
+
+
+
+      <template v-slot:body-cell-locked="props">
+        <q-td :props="props" key="id">
+          <div>
+            <q-badge outline :color="props.row.locked?'red':'green'" :label="props.row.locked?'已封禁':'未封禁' " />
+
+          </div>
+        </q-td>
+      </template>
+
+      <template v-slot:body-cell-enabled="props">
+        <q-td :props="props" key="id">
+          <div>
+            <q-badge outline :color="props.row.enabled?'blue':'brown'" :label="props.row.enabled?'可使用':'不可用' " />
+
+          </div>
+        </q-td>
+      </template>
+
+
+
+
 
       <template v-slot:body-cell-operation="props">
         <q-td :props="props">
           <div class="q-mt-md q-mb-md">
-            <q-btn flat color="primary" label="编辑" @click="edit(props.row)"/>
+            <q-btn-dropdown color="primary" label="编辑"  @click="edit(props.row)" split>
+
+              <q-list>
+
+                <!--              <q-item clickable v-close-popup v-if="props.row.musicLabel !== '√音乐播放'" @click="downLoadMusicFilePQ(props.row)">-->
+                <!--                <q-item-section>-->
+                <!--                  <q-item-label>下载歌曲</q-item-label>-->
+                <!--                </q-item-section>-->
+                <!--              </q-item>-->
+
+                <!--                <q-item clickable v-close-popup v-if="props.row.musicState !== '已上架'" @click="publishMusic(props.row.id)">-->
+                <!--                  <q-item-section>-->
+                <!--                    <q-item-label>上架音乐</q-item-label>-->
+                <!--                  </q-item-section>-->
+                <!--                </q-item>-->
+
+                <!--                <q-item clickable v-close-popup  v-if="props.row.musicState !== '已下架'" @click="closedMusic(props.row.id)">-->
+                <!--                  <q-item-section>-->
+                <!--                    <q-item-label>下架音乐</q-item-label>-->
+                <!--                  </q-item-section>-->
+                <!--                </q-item>-->
+
+                <!--                <q-item clickable v-close-popup  v-if="props.row.musicState !== '待上架'" @click="freeMusic(props.row.id)">-->
+                <!--                  <q-item-section>-->
+                <!--                    <q-item-label>闲置音乐</q-item-label>-->
+                <!--                  </q-item-section>-->
+                <!--                </q-item>-->
+
+                <q-item clickable v-close-popup  @click="openConfirmDialog(props.row.id)">
+                  <q-item-section>
+                    <q-item-label>删除</q-item-label>
+                  </q-item-section>
+                </q-item>
+
+              </q-list>
+            </q-btn-dropdown>
+
+
+
           </div>
+
+
+
         </q-td>
+      </template>
+
+      <!--    顶部搜索栏-->
+      <template v-slot:top-right>
+        <q-input borderless dense debounce="300" v-model="filter" placeholder="请输入关键字" @keyup.enter.native="searchDataByName">
+          <template v-slot:append>
+            <q-icon name="search" @click="searchDataByName"/>
+          </template>
+        </q-input>
+      </template>
+
+      <!--表格中的某个字段设置样式 cell后面的英文就是该字段-->
+      <template v-slot:header-cell-playMusic="props" >
+        <q-th :props="props" style="width: 350px;">
+          {{ props.col.label }}
+        </q-th>
       </template>
 
     </q-table>
@@ -37,23 +137,62 @@
           size="sm"
           @click="updateData"
       />
-      <CreateUserDialog ref="RefChildren" @fetchData="fetchData" :editRow="editRow"></CreateUserDialog>
+      <CreateUserDialog ref="RefChildren" @fetchData="fetchData" :rowData="rowData">></CreateUserDialog>
+
+      <q-dialog v-model="confirmDelete" persistent>
+        <q-card>
+          <q-card-section class="row items-center">
+            <q-avatar icon="warning" color="red" text-color="white" />
+            <span class="q-ml-sm">您确定要删除吗?</span>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn flat label="取消" color="primary" v-close-popup />
+            <q-btn flat label="确定" color="primary" v-close-popup @click="deleteUserById()"/>
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
     </div>
   </div>
 </template>
 
 <script setup>
 import {computed, ref, onMounted, defineComponent} from "vue";
-import {getPageByUsername} from "../../api/user.js";
+import {deleteUser, getPageByUserName, getPageByUsername} from "../../api/user.js";
 import {nextTick,watch,watchEffect, toRefs} from 'vue'
 
 import CreateUserDialog from "../../components/user/CreateUserDialog.vue";
+
+import ArtistSelectionElementUI from "../../components/common/artistSelection/ArtistSelectionElementUI.vue"
+
+import {
+  changeMusicStateToClosed,
+  changeMusicStateToPublic,
+  changeMusicStateToWaited, deleteMusic,
+  getPageByMusicName
+} from "../../api/music.js";
+import {musicStatusColor} from '../../utils/musicSlotColorEnum.js';
+import {useQuasar} from "quasar";
+import {deletePlayList} from "../../api/play_list.js";
+import {freeMusicFromFreeMp3, searchFromGM} from "../../api/freeMusic.js";
+import axios from "axios";
+import {encode} from "../../utils/encodeObsfuscator.js";
+import {deleteTag, getPageByTagName} from "../../api/tag.js";
+
+const $q = useQuasar()
 
 const columns = [
   {name:"id",label: 'Id', field: 'id', sortable: true, align: 'left'},
   {name:"username",label: '用户名', field: 'username', sortable: true, align: 'left'},
   {name:"nickname",label: '昵称', field: 'nickname', sortable: true, align: 'left'},
+  {name:"roleList",label: '角色', field: 'roleList', sortable: true, align: 'left'},
+  {name:"locked",label: '是否封禁', field: 'locked', sortable: true, align: 'left'},
+  {name:"enabled",label: '是否可用', field: 'enabled', sortable: true, align: 'left'},
+
+
   {name:"operation",label: '操作', field: 'operation', align: 'left'},
+
 
 ]
 const rows = ref([])
@@ -71,7 +210,13 @@ const pagination = ref({
 const current =ref(1);
 const allNum =ref(1);
 const sortNum =ref([ 3, 5, 7, 10, 15, 20, 25, 50 ]);
-const editRow =ref(null)
+
+const rowData =ref(null)
+const confirmDelete= ref (null)
+const rowId=ref(null)
+
+const wantPlay=ref(false)
+const filter =ref(null)
 
 //子组件
 const RefChildren = ref(null)
@@ -81,6 +226,13 @@ const pagesNumber = computed(() => Math.ceil(total.value / pagination.value.rows
 const toggleDialog = () => {
   RefChildren.value.togglePrompt();
 }
+
+//父调子
+const toggleDialogEdit = () => {
+  RefChildren.value.togglePromptEdit();
+}
+
+
 //暂时废弃
 const updateData = () => {
 
@@ -111,58 +263,335 @@ const updateData = () => {
 // })
 
 
+
 // 多值监听
 watch([pagination,current],([newPagination,newCurrent],[oldPagination,oldCurrent])=>{
-    console.log(newCurrent)
-  getPageByUsername(newCurrent, newPagination.rowsPerPage, "").then(res => {
-    console.log(pagination.value.rowsPerPage)
-    console.log(res);
-    rows.value = res.data.records;
-    total.value = res.data.total;
-    sortNum.value=([ 3, 5, 7, 10, 15, 20, 25, 50,total.value]);
+  console.log(newCurrent)
 
-    if (res.data.records === null){
-      current.value=1;
-    }
+  getPageByName(newCurrent,newPagination.rowsPerPage,"")
 
-  })
+
 })
 
 
 
 const getPaginationLabel =(firstRowIndex, endRowIndex, totalRowsNumber)=>{
 
-      // firstRowIndex=pagination.value.rowsPerPage*(current.value-1)+1
-      // endRowIndex= pagination.value.rowsPerPage*(current.value-1) + rows.value.length
-      //
-      totalRowsNumber=total.value;
+  // firstRowIndex=pagination.value.rowsPerPage*(current.value-1)+1
+  // endRowIndex= pagination.value.rowsPerPage*(current.value-1) + rows.value.length
+  //
+  totalRowsNumber=total.value;
 
-      // return `${firstRowIndex}-${endRowIndex} of total:${totalRowsNumber}`
+  // return `${firstRowIndex}-${endRowIndex} of total:${totalRowsNumber}`
 
   return `TOTAL:${totalRowsNumber}`
 }
 
+const getPageByName =(pageNum,pageSize,SearchWord)=>{
+  // axios.post('test/search',{data:SearchWord,v:2}).then(res=>{
+  //   console.log(res)
+  // })
 
-const fetchData = () => {
 
-  getPageByUsername(pagination.value.page, pagination.value.rowsPerPage, "").then(res => {
+  // filter.value='仙剑奇侠传'
+  // if (filter.value !== null){
+  //
+  //
+  //   let data =encode('text='+filter.value+'&page='+current.value+'&type=migu').slice(5,-1)
+  //   let v =2
+  //   console.log(data)
+  //
+  //   let params = new URLSearchParams();
+  //   params.append("data",data)
+  //   params.append("v",v)
+  //
+  //   freeMusicFromFreeMp3(params).then(res=>{
+  //     console.log(res)
+  //   })
+  //
+  // }
+  //
+
+  getPageByUserName(pageNum, pageSize, SearchWord).then(res=>{
     console.log(pagination.value.rowsPerPage)
     console.log(res);
     rows.value = res.data.records;
     total.value = res.data.total;
-    // pagination.value.rowsNumber=total.value;
   })
+  //
+  // getPageByMusicName(pageNum, pageSize, SearchWord).then(res => {
+  //   console.log(pagination.value.rowsPerPage)
+  //   console.log(res);
+  //   res.data.records.map(item=>{item.tagLabel='音乐播放'})
+  //   rows.value = res.data.records;
+  //
+  //
+  //   rows.value.map((item,index)=>{
+  //     // let searchSwitch={song:1,album:0,singer:0,tagSong:0,mvSong:0,songlist:0,bestShow:1}
+  //     let searchWord = item.name+'-'+item.artistVoList[0].name
+  //     // let searchWord = item.name+'-'+item.artistVoList[0].name
+  //
+  //     let data =encode('text='+searchWord+'&page=1'+'&type=migu')
+  //     // console.log(data)
+  //     data =data.split("&")[0].split("=")[1]
+  //     let v =2
+  //     // console.log(data)
+  //
+  //     let params = new URLSearchParams();
+  //     params.append("data",data)
+  //     params.append("v",v)
+  //
+  //     freeMusicFromFreeMp3(params).then(res=> {
+  //       // console.log( res.data)
+  //       // console.log(res.data.data.list)
+  //       // console.log(item.name)
+  //       // res.data.data.list=res.data.data.list.filter(music=>music.name.indexOf(item.name) !== -1)
+  //       let dataList =res.data.data.list
+  //       res.data.data.list=res.data.data.list.filter(music=>music.name===(item.name))
+  //
+  //       if (res.data.data.list.length === 0) {
+  //         console.log(item.name,item.name,item.name)
+  //         res.data.data.list = dataList.filter(music => music.name.indexOf(item.name) !== -1)
+  //
+  //         if (res.data.data.list.length !== 0) {
+  //           console.log(res.data.data.list[0].name)
+  //         }
+  //       }
+  //       console.log( res.data.data)
+  //       if ( res.data.data.list[0]) {
+  //
+  //         // console.log(res.data.data.list[0])
+  //         let ourArtist = item.artistVoList[0].name
+  //         // console.log(ourArtist)
+  //         let MGArtist =res.data.data.list.filter(list=>list.artist.includes(ourArtist))
+  //         console.log(MGArtist)
+  //
+  //
+  //
+  //         if (res.data.data.list != null && (MGArtist.length!== 0)  ) {
+  //           item.file.url = res.data.data.list[0].url
+  //           item.tagLabel='√音乐播放'
+  //           item.mgMusic=res.data.data.list[0]
+  //         }
+  //
+  //
+  //       }
+  //
+  //     })
+  //
+  //   })
+  //
+  //   total.value = res.data.total;
+  //   // pagination.value.rowsNumber=total.value;
+  //
+  //   sortNum.value=([ 3, 5, 7, 10, 15, 20, 25, 50,total.value]);
+  //
+  //   if (res.data.records === null){
+  //     current.value=1;
+  //   }
+  //
+  // })
 }
 
+const fetchData = () => {
+  getPageByName(current.value,pagination.value.rowsPerPage,"")
+}
+
+const searchDataByName =()=>{
+  getPageByName(current.value,pagination.value.rowsPerPage,filter.value)
+}
 
 onMounted(fetchData);
 
 const edit =(row)=>{
-  editRow.value =row;
-  console.log(editRow.value)
+  console.log(current.value)
+  rowData.value =row;
+  console.log(rowData.value)
+
+  nextTick(()=>{
+    toggleDialogEdit()
+  })
+
+}
+
+const publishMusic=(id)=>{
+  changeMusicStateToPublic(id).then(res=>{
+    console.log(res)
+    fetchData();
+    $q.notify({message: '上架成功', position: "top", type: 'positive',});
+  })
+}
+
+const closedMusic =(id)=>{
+  changeMusicStateToClosed(id).then(res=>{
+    console.log(res)
+    fetchData();
+    $q.notify({message: '下架成功', position: "top", type: 'positive',});
+  })
+}
+
+const freeMusic =(id)=>{
+  changeMusicStateToWaited(id).then(res=>{
+    console.log(res)
+    fetchData();
+    $q.notify({message: '闲置成功', position: "top", type: 'positive',});
+  })
+}
+
+const openConfirmDialog =(id)=>{
+  confirmDelete.value=true
+  rowId.value =id
+
+}
+
+const deleteUserById =()=>{
+  if (rowId.value !== null) {
+    deleteUser(rowId.value).then(res => {
+      console.log(res)
+      fetchData();
+      $q.notify({message: '删除成功', position: "top", type: 'positive',});
+    })
+  }
+  rowId.value=null;
+}
+
+const playMusicAudio =(row)=>{
+  row.wantPlay = true
+  //  let searchSwitch={song:1,album:0,singer:0,tagSong:0,mvSong:0,songlist:0,bestShow:1}
+  //   let searchWord = row.name+''+row.artistVoList[0].name
+  //     console.log(searchWord)
+  // searchFromGM('Android_migu','5.0.1',searchWord,current.value,pagination.value.rowsPerPage,searchSwitch).then(res=> {
+  //
+  //   if ( res.data.songResultData.result[0]) {
+  //
+  //   console.log(res)
+  //   let ourArtist = row.artistVoList[0].name
+  //   console.log(ourArtist)
+  //   let MGArtist = res.data.songResultData.result[0].singers.map(item => item.name).includes(ourArtist)
+  //
+  //   console.log(MGArtist)
+  //   if (res.data.songResultData.result != null && (MGArtist === true)) {
+  //     row.file.url = res.data.songResultData.result[0].rateFormats[0].url.replace('ftp://218.200.160.122:21', 'https://freetyst.nf.migu.cn')
+  //     row.wantPlay = true
+  //     row.MGRes=res.data;
+  //   }else {
+  //     //有歌但不是一个作者的歌
+  //     row.wantPlay = true
+  //   }
+  //
+  //
+  // }else {
+  //     //GM没有的歌
+  //     row.wantPlay = true
+  //   }
+  //
+  // })
+
+
 }
 
 
+const downLoadMusicFilePQ=(row)=>{
+  console.log(row)
+  window.open(row.file.url.replace("http://218.205.239.34","/encodeMusicFile"),'blank')
+
+  //
+  // const config = {
+  //   baseURL: row.file.url,
+  //
+  //
+  // };
+
+  // console.log(axios.getUri(config))
+
+  // console.log(row.file.url)
+  // window.open(row.rateFormats[0].url.replace('ftp://218.200.160.122:21','https://freetyst.nf.migu.cn'),'blank')
+  // axios.get(row.file.url.replace("http://218.205.239.34","/encodeMusicFile"),{ responseType: 'blob',redirect:'follow',headers: { 'Content-Type': 'application/x-www-form-urlencoded'} }).then(res=>{
+  //
+  //   console.log(res)
+  //   //content就是你下载的内容
+  //   let content=res.data
+  //
+  //   //创建一个a标签
+  //   let a = document.createElement('a');
+  //   //创建一个用于下载的url 记得要是blob类型不然没法正常下载 注意这个content就是我们要下载的文件内容
+
+  //   let url = window.URL.createObjectURL(new Blob([content],
+  //       { type:"charset=" + ( 'utf-8') }));
+  //   //将a标签的href设置为url
+  //   a.href = url;
+  //   //将a标签的download属性设置为我们想要的文件名即可
+  //   a.download =  row.name+'-'+row.artistVoList.map(item=>item.name).join('/')+'.'+'mp3';
+  //   //然后我们设置一个a标签的click事件，这样就会开始下载了
+  //   a.click();
+  //   //销毁我们前面设置的a标签
+  //   window.URL.revokeObjectURL(url);
+  //
+  // })
+
+}
+const downLoadMusicLyc=(row)=>{
+  console.log(row.mgMusic.lrc)
+  // window.open(row.mgMusic.lyricUrl,'blank')
+  //使用下blob下载请求的时候记得要加上responseType: 'blob' 不然可能出现中文乱码
+  axios.get(row.mgMusic.lrc,{ responseType: 'blob' }).then(res=>{
+
+    //content就是你下载的内容
+    let content=res.data
+
+    //创建一个a标签
+    let a = document.createElement('a');
+    //创建一个用于下载的url 记得要是blob类型不然没法正常下载 注意这个content就是我们要下载的文件内容
+    let url = window.URL.createObjectURL(new Blob([content],
+        { type:"charset=" + ( 'utf-8') }));
+    //将a标签的href设置为url
+    a.href = url;
+    //将a标签的download属性设置为我们想要的文件名即可
+    a.download =  row.name+'-'+row.artistVoList.map(item=>item.name).join('/')+'.'+'lrc';
+    //然后我们设置一个a标签的click事件，这样就会开始下载了
+    a.click();
+    //销毁我们前面设置的a标签
+    window.URL.revokeObjectURL(url);
+  })
+}
+
+const downLoadMusicImg=(row)=>{
+
+  var image = new Image()
+
+  // 解决跨域 Canvas 污染问题
+  image.setAttribute('crossOrigin', 'anonymous');
+  let type= 'png'
+  let name =row.name+'-'+row.artistVoList.map(item=>item.name).join('/')
+  image.src = row.mgMusic.cover;
+  image.onload = function () {
+    // 创建一个canvas标签
+    var canvas = document.createElement('canvas')
+    // 设置canvas的宽高
+
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    var context = canvas.getContext('2d')
+    context.drawImage(image, 0, 0);
+
+    // 把canvas的内容转化为base64格式
+    var imageType = type === "png" ? "image/png" : "image/jpeg";
+    var base64url = canvas.toDataURL(imageType)
+
+    // 生成一个a元素
+    var a = document.createElement('a');
+    a.download = name || '文件下载'
+    a.href = base64url
+    // 创建一个单击事件
+    var event = new MouseEvent('click');
+
+    // 触发a的单击事件
+    a.dispatchEvent(event)
+  }
+  // window.open(row.imgItems[2].img,'blank')
+
+
+}
 
 </script>
 

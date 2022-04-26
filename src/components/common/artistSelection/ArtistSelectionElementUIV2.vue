@@ -1,5 +1,7 @@
 <template>
-    <div class="title">选择歌手</div>
+  <div class="screening-config">
+
+  <div class="title">选择歌手</div>
     <el-select-v2 @change=showValue v-model="selectArtistList"     :options="artistList"
                   filterable  multiple clearable
                   popper-class="test"
@@ -9,11 +11,11 @@
 
       <template #default="{ item }">
         <span style="float: left">{{ item.label }}</span>
-        <img style="float: right;width: 30px;height: 30px" :src="item.url" />
+<!--        <img style="float: right;width: 30px;height: 30px" :src="item.url" />-->
       </template>
 
     </el-select-v2>
-
+  </div>
 </template>
 
 <script setup>
@@ -22,7 +24,7 @@ import { ElMessage,ElSelect,ElOption,ElCard,ElSelectV2 } from 'element-plus'
 
 import {onMounted, ref,onBeforeMount} from 'vue'
 import {defineProps} from "vue"
-import {getArtistList} from "../../../api/artist.js";
+import {getArtistList, getArtistSelectionList} from "../../../api/artist.js";
 const options=ref([])
 const selectArtistList = ref('')
 const artistList =ref([])
@@ -31,7 +33,7 @@ const initArtistList =ref([])
 onMounted(()=> {
 
 
-  getArtistList().then(res => {
+  getArtistSelectionList().then(res => {
     // //传入已有的歌手
     if (props.artistListFromFather !==null){
       selectArtistList.value=props.artistListFromFather;
@@ -40,7 +42,10 @@ onMounted(()=> {
 
     artistList.value=initArtistList.value
 
-    artistList.value=artistList.value.map((item)=>({value:item.id, label:item.name,url:item.photo.url}))
+    artistList.value=artistList.value.map((item)=>({value:item.id,
+      label:item.name,
+      // url:item.photo.url
+      }))
 
   })
 
@@ -75,6 +80,5 @@ const showValue=()=>{
 <style scoped>
 
 .title {
-  padding: 0px 0 18px 0;
 }
 </style>

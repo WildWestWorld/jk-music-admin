@@ -26,19 +26,27 @@ import 'element-plus/es/components/message/style/css'
 import { ElMessage,ElSelect,ElOption,ElCard,ElSelectV2 } from 'element-plus'
 
 import {onMounted, ref,onBeforeMount} from 'vue'
-import {defineProps} from "vue"
-import {getArtistList} from "../../../api/artist.js";
-import {getMusicList} from "../../../api/music.js";
+import {defineProps,defineExpose} from "vue"
+import {getArtistList, getArtistSelectionList} from "../../../api/artist.js";
+import {getMusicList, getMusicSelectionList} from "../../../api/music.js";
 const options=ref([])
 const selectMusicList = ref('')
 const MusicList =ref([])
 const initMusicList =ref([])
 const selectOptionWidth =ref(null)
 
+
 onMounted(()=> {
 
+  getMusicListData()
 
-  getMusicList().then(res => {
+
+
+})
+
+const getMusicListData=()=>{
+
+  getMusicSelectionList().then(res => {
     // //传入已有的歌手
     if (props.MusicListFromFather !==null){
       selectMusicList.value=props.MusicListFromFather;
@@ -55,15 +63,11 @@ onMounted(()=> {
       // label:item.name,
 
       label:item.name+'-'+item.artistVoList.map(item=>item.name).join('/'),
-      url:item.file.url}))
+      // url:item.file.url
+      }))
 
   })
-
-
-
-})
-
-
+}
 
 
 const emit =defineEmits(['MusicSelectionElementUI']);
@@ -77,7 +81,9 @@ const props = defineProps(
     })
 
 
-
+defineExpose({
+  getMusicListData
+})
 
 
 const showValue=()=>{

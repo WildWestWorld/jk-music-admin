@@ -16,6 +16,11 @@ export const layoutChildren=[{
   meta:{title:'用户管理', icon:'manage_accounts'},
   component: ()=>import("../views/layoutChildren/User.vue"),
 },{
+  path: '/role',
+  name:"Role",
+  meta:{title:'角色管理', icon:'account_box'},
+  component: ()=>import("../views/layoutChildren/Role.vue"),
+},{
   path: '/music',
   name:"Music",
   meta:{title:'音乐管理', icon:'music_note'},
@@ -36,6 +41,14 @@ export const layoutChildren=[{
   meta:{title:'专辑管理', icon:'library_music'},
   component: ()=>import("../views/layoutChildren/Album.vue"),
 },{
+  path: '/tag',
+  name:"tag",
+  meta:{title:'标签管理', icon:'receipt'},
+  component: ()=>import("../views/layoutChildren/Tag.vue"),
+},
+
+
+  {
   path: '/freeMusic',
   name:"freeMusic",
   meta:{title:'乐库管理', icon:'audio_file'},

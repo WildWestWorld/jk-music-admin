@@ -64,7 +64,7 @@ const getPlayListData=()=>{
       value:item.id,
       // label:item.name,
 
-      label:item.name,
+      label:item.creator?item.name+'-'+item.creator.username:item.name,
     }))
 
   })

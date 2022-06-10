@@ -9,10 +9,11 @@
 <!--      {{file.name+'.'+file.ext}}-->
 <!--      <q-btn @click="reUpload" >重新上传</q-btn>-->
 
-      <q-field :color="props.label.toString().indexOf('封面') !== -1?'red':'deep-purple-13'" filled :label="props.label+'名称'" stack-label >
+      <q-field :color="props.label.toString().indexOf('封面') !== -1?'red':props.label.toString().indexOf('歌词') !== -1?'deep-purple-13':'blue'" filled :label="props.label+'名称'" stack-label >
         <template v-slot:prepend>
           <q-icon v-if="props.label.toString().indexOf('封面') !== -1" name="photo" />
           <q-icon v-if="props.label.toString().indexOf('音乐文件') !== -1" name="music_video" />
+          <q-icon v-if="props.label.toString().indexOf('歌词') !== -1" name="note" />
 
         </template>
         <template v-slot:control>
@@ -68,7 +69,12 @@ const text=ref('测试')
 const reUpload =()=>{
   file.value=null;
   file.str=props.label
-  emit('uploadedGF',file.value)
+  // file.value
+
+
+  console.log(props.label)
+  console.log(file)
+  emit('uploadedGF',file.value||file)
 
 }
 

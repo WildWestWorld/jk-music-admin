@@ -17,7 +17,7 @@ const getters ={
     },
 
 };
-
+//用于异步操作
 const actions ={
     fetchSiteSetting({commit}){
         return new Promise((resolve,reject)=>{
@@ -32,7 +32,7 @@ const actions ={
 
     }
 };
-
+//用于同步
 const mutations ={
     SITE_SETTING_FETCHED:(state,siteSetting)=>{
         state.site =siteSetting

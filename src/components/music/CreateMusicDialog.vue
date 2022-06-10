@@ -42,7 +42,9 @@
         <Uploader :label="musicLabel" @uploadedGF="uploadedGF" :fileEdit="fileEdit"></Uploader>
       </q-card-section>
 
-
+        <q-card-section class="q-pt-none">
+          <Uploader :label="musicLycLabel" @uploadedGF="uploadedGF" :fileEdit="musicLycFileEdit"></Uploader>
+        </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
         <q-btn label="确认" color="primary" v-close-popup @click="isEdit?editMusic():createMusic()"/>
@@ -88,6 +90,12 @@ const musicPhotoFile = ref(null)
 const musicPhotoFileId =ref(null)
 const musicPhotoFileEdit =ref(null)
 
+
+const musicLycFile = ref(null)
+const musicLycFileId =ref(null)
+const musicLycFileEdit =ref(null)
+
+
 const id =ref(null)
 const music = ref(props.rowData||{name: '', description: '', file: null})
 
@@ -105,6 +113,9 @@ const isEdit =ref(null)
 
 const musicLabel = ref('音乐文件');
 const musicPhotoLabel = ref('封面文件');
+const musicLycLabel = ref('歌词文件');
+
+
 
 const $q = useQuasar()
 
@@ -125,8 +136,8 @@ const props = defineProps(
 
 
 const uploadedGF = (res) => {
-
-if (res.label !== null) {
+  console.log(res)
+if (res.label ) {
 
   if (res.label.toString().indexOf(musicPhotoLabel.value) !== -1) {
 
@@ -148,15 +159,36 @@ if (res.label !== null) {
 
   }
 
+  if (res.label.toString().indexOf(musicLycLabel.value) !== -1) {
+
+    musicLycFile.value = res;
+    if (musicLycFile.value !== null) {
+      musicLycFileId.value = musicLycFile.value.id;
+
+    }
+
+
+
+  }
+
 
 }else {
   if (res.str !== null) {
+    console.log(res.str)
     if (res.str.toString().indexOf(musicPhotoLabel.value) !== -1) {
       musicPhotoFile.value = null
       musicPhotoFileId.value = null
-    }else (res.str.toString().indexOf(musicLabel.value))
-    file.value =null
-    fileId.value=null
+    }
+    if(res.str.toString().indexOf(musicLabel.value) !== -1 ){
+      file.value =null
+      fileId.value=null
+    }
+    if(res.str.toString().indexOf(musicLycLabel.value) !== -1){
+
+      musicLycFile.value = null
+      musicLycFileId.value = null
+    }
+
   }
 }
 
@@ -167,7 +199,7 @@ if (res.label !== null) {
 
 const createMusic = () => {
   //获取对象的时候不能放到函数外面，不然的话只能获取初值
-  music.value = {name: name.value, description: description.value, fileId:fileId.value,file: file.value,photoId:musicPhotoFileId.value,artistIdList:artistIdListFromChild.value,albumIdList:albumIdListFromChild.value,tagIdList:tagIdListFromChild.value};
+  music.value = {name: name.value, description: description.value, fileId:fileId.value,file: file.value,photoId:musicPhotoFileId.value,lycId:musicLycFileId.value,artistIdList:artistIdListFromChild.value,albumIdList:albumIdListFromChild.value,tagIdList:tagIdListFromChild.value};
 
 
 
@@ -183,7 +215,7 @@ const createMusic = () => {
 }
 
 const editMusic = ()=>{
-  music.value = {id:id.value,name: name.value, description: description.value, fileId:fileId.value,file: file.value,photoId:musicPhotoFileId.value,artistIdList:artistIdListFromChild.value,albumIdList:albumIdListFromChild.value,tagIdList:tagIdListFromChild.value};
+  music.value = {id:id.value,name: name.value, description: description.value, fileId:fileId.value,file: file.value,photoId:musicPhotoFileId.value,lycId:musicLycFileId.value,artistIdList:artistIdListFromChild.value,albumIdList:albumIdListFromChild.value,tagIdList:tagIdListFromChild.value};
 
   updateMusic(music.value.id,music.value).then(res=>{
     console.log(res)
@@ -206,6 +238,10 @@ const togglePrompt = () => {
   musicPhotoFile.value=null;
   musicPhotoFileId.value=null;
   musicPhotoFileEdit.value=null;
+
+  musicLycFile.value=null;
+  musicLycFileId.value=null;
+  musicLycFileEdit.value=null;
 
   id.value =null;
   artistIdListFromChild.value=null;
@@ -245,6 +281,10 @@ const togglePromptEdit =()=>{
   musicPhotoFileId.value=null;
   musicPhotoFileEdit.value=null;
 
+  musicLycFile.value=null;
+  musicLycFileId.value=null;
+  musicLycFileEdit.value=null;
+
   id.value =null;
   artistIdListFromChild.value=null
   artistIdListFromFather.value=null;
@@ -274,6 +314,15 @@ const togglePromptEdit =()=>{
     musicPhotoFileId.value=props.rowData.photo.id;
     musicPhotoFileEdit.value=props.rowData.photo
   }
+
+  if(props.rowData.lyc !== null){
+
+    musicLycFile.value=props.rowData.lyc;
+    musicLycFileId.value=props.rowData.lyc.id;
+    musicLycFileEdit.value=props.rowData.lyc;
+
+  }
+
 
   id.value = props.rowData.id;
   artistIdListFromChild.value=props.rowData.artistVoList.map(item=>item.id)

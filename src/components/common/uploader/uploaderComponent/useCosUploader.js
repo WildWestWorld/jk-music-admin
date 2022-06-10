@@ -52,7 +52,7 @@ export default createUploaderComponent({
             uploadFile.value={
                 name: filesArray.value[0].name.substring(0, filesArray.value[0].name.lastIndexOf('.')),
                 size: filesArray.value[0].size,
-                hashKey: md5(filesArray.value[0].lastModified+new Date().getTime()),
+                hashKey: md5(filesArray.value[0].lastModified+new Date().getTime())+'.'+filesArray.value[0].name.substring(filesArray.value[0].name.lastIndexOf('.')+1),
                 ext: filesArray.value[0].name.substring(filesArray.value[0].name.lastIndexOf('.')+1)
             }
             startUpload();
